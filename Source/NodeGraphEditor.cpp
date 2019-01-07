@@ -242,6 +242,7 @@ void NodeGraphEditor::mouseUp(const MouseEvent &event) {
 				break;
 			case ModuleType::AMRM:
 				ngp->modules.push_back(new AMRMModule());
+				break;
 			default:
 				ngp->modules.push_back(new GainModule());
 				break;

@@ -43,23 +43,25 @@ void SampleAndHoldModule::SetParameter(int id, float value) {
 }
 
 double SampleAndHoldModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	double signal = 0.0f;
-	float triggerValue = 0.0f;
-	if (inputs[0].connectedModule >= 0) {
-		signal = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
+	if (canBeEvaluated) {
+		double signal = 0.0f;
+		float triggerValue = 0.0f;
+		if (inputs[0].connectedModule >= 0) {
+			signal = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
+		}
+		if (inputs[1].connectedModule >= 0) {
+			triggerValue = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
+		}
+		if (triggerValue > 0.0f && !holding) {
+			holding = true;
+			heldValue = signal;
+		}
+		if (triggerValue <= 0.0f) {
+			holding = false;
+			heldValue = 0.0f;
+		}
+		outputs[0] = heldValue;
+		canBeEvaluated = false;
 	}
-	if (inputs[1].connectedModule >= 0) {
-		triggerValue = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
-	}
-	if (triggerValue > 0.0f && !holding) {
-		holding = true;
-		heldValue = signal;
-	}
-	if (triggerValue <= 0.0f) {
-		holding = false;
-		heldValue = 0.0f;
-	}
-	outputs[outputID] = heldValue;
-
 	return outputs[outputID];
 }

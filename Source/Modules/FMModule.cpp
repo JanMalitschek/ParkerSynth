@@ -80,29 +80,31 @@ void FMModule::SetParameter(int id, float value) {
 }
 
 double FMModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	double a = 0.0; //frequency
-	double b = 0.0; //modulator signal
-	double c = 0.0; //modulator frequency
-	if (inputs[0].connectedModule >= 0)
-		a = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
-	else
-		a = 0.0;
-	if (inputs[1].connectedModule >= 0)
-		b = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
-	else
-		b = 0.0;
-	if (inputs[2].connectedModule >= 0)
-		c = ngp->modules[inputs[2].connectedModule]->GetResult(midiNote, velocity, inputs[2].connectedOutput, voiceID);
-	else
-		b = 1.0;
+	if (canBeEvaluated) {
+		double a = 0.0; //frequency
+		double b = 0.0; //modulator signal
+		double c = 0.0; //modulator frequency
+		if (inputs[0].connectedModule >= 0)
+			a = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
+		else
+			a = 0.0;
+		if (inputs[1].connectedModule >= 0)
+			b = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
+		else
+			b = 0.0;
+		if (inputs[2].connectedModule >= 0)
+			c = ngp->modules[inputs[2].connectedModule]->GetResult(midiNote, velocity, inputs[2].connectedOutput, voiceID);
+		else
+			b = 1.0;
 
-	double amount = 0.0;
-	if (controls[0].connectedModule >= 0)
-		amount = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID) * fmKnob.getValue();
-	else
-		amount = fmKnob.getValue();
+		double amount = 0.0;
+		if (controls[0].connectedModule >= 0)
+			amount = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID) * fmKnob.getValue();
+		else
+			amount = fmKnob.getValue();
 
-	outputs[0] = a + b * c * amount;
-
+		outputs[0] = a + b * c * amount;
+		canBeEvaluated = false;
+	}
 	return outputs[outputID];
 }

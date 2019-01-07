@@ -146,32 +146,33 @@ void BasicGeneratorModule::CalculateUnisonVoices(float freq, int voiceID) {
 }
 
 double BasicGeneratorModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	float freq = 0.0f;
-	if (inputs[1].connectedModule >= 0)
-		freq = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
-	else
-		freq = 440.0f;
+	if (canBeEvaluated) {
+		float freq = 0.0f;
+		if (inputs[1].connectedModule >= 0)
+			freq = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
+		else
+			freq = 440.0f;
 
-	if (voices[voiceID].oldFrequency != freq || voices[voiceID].recalculate == true) {
-		CalculateUnisonVoices(freq, voiceID);
-		voices[voiceID].oldFrequency = freq;
-		voices[voiceID].recalculate = false;
-	}
-
-	if (controls[0].connectedModule >= 0) {
-		float currentDetune = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID);
-		if (oldDetune != currentDetune) {
-			detuneKnob.setValue(currentDetune);
-			oldDetune = currentDetune;
+		if (voices[voiceID].oldFrequency != freq || voices[voiceID].recalculate == true) {
+			CalculateUnisonVoices(freq, voiceID);
+			voices[voiceID].oldFrequency = freq;
+			voices[voiceID].recalculate = false;
 		}
-	}
 
-	if (inputs[0].connectedModule >= 0) {
-		/*double cyclesPerSecond = freq / 44100;
-		voices[voiceID].angleDelta = cyclesPerSecond * 2.0 * MathConstants<double>::pi;*/
-		int numUniVoices = (int)voicesKnob.getValue();
-		float uniVolumeFactor = 1.0 / (float)numUniVoices;
-		switch ((int)(shapeKnob.getValue())) {
+		if (controls[0].connectedModule >= 0) {
+			float currentDetune = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID);
+			if (oldDetune != currentDetune) {
+				detuneKnob.setValue(currentDetune);
+				oldDetune = currentDetune;
+			}
+		}
+
+		if (inputs[0].connectedModule >= 0) {
+			/*double cyclesPerSecond = freq / 44100;
+			voices[voiceID].angleDelta = cyclesPerSecond * 2.0 * MathConstants<double>::pi;*/
+			int numUniVoices = (int)voicesKnob.getValue();
+			float uniVolumeFactor = 1.0 / (float)numUniVoices;
+			switch ((int)(shapeKnob.getValue())) {
 			case 0:
 				outputs[0] = 0.0;
 				for (int i = 0; i < numUniVoices; i++) {
@@ -203,9 +204,80 @@ double BasicGeneratorModule::GetResult(int midiNote, float velocity, int outputI
 			default:
 
 				break;
+			}
 		}
+		else
+			outputs[0] = 0.0;
+
+		canBeEvaluated = false;
 	}
-	else
-		outputs[0] = 0.0;
 	return outputs[outputID];
+}
+
+void BasicGeneratorModule::GetResultIteratively(int voiceID) {
+	if (canBeEvaluated) {
+		float freq = 0.0f;
+		if (inputs[1].connectedModule >= 0)
+			freq = ngp->modules[inputs[1].connectedModule]->outputs[inputs[1].connectedOutput];
+		else
+			freq = 440.0f;
+
+		if (voices[voiceID].oldFrequency != freq || voices[voiceID].recalculate == true) {
+			CalculateUnisonVoices(freq, voiceID);
+			voices[voiceID].oldFrequency = freq;
+			voices[voiceID].recalculate = false;
+		}
+
+		if (controls[0].connectedModule >= 0) {
+			float currentDetune = ngp->modules[controls[0].connectedModule]->outputs[controls[0].connectedOutput];
+			if (oldDetune != currentDetune) {
+				detuneKnob.setValue(currentDetune);
+				oldDetune = currentDetune;
+			}
+		}
+
+		if (inputs[0].connectedModule >= 0) {
+			/*double cyclesPerSecond = freq / 44100;
+			voices[voiceID].angleDelta = cyclesPerSecond * 2.0 * MathConstants<double>::pi;*/
+			int numUniVoices = (int)voicesKnob.getValue();
+			float uniVolumeFactor = 1.0 / (float)numUniVoices;
+			switch ((int)(shapeKnob.getValue())) {
+			case 0:
+				outputs[0] = 0.0;
+				for (int i = 0; i < numUniVoices; i++) {
+					outputs[0] += std::sin(voices[voiceID].uniVoices[i].currentAngle) * ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput] * uniVolumeFactor;
+					voices[voiceID].uniVoices[i].currentAngle += voices[voiceID].uniVoices[i].angleDelta;
+				}
+				break;
+			case 1:
+				outputs[0] = 0.0;
+				for (int i = 0; i < numUniVoices; i++) {
+					outputs[0] += std::asin(std::sin(voices[voiceID].uniVoices[i].currentAngle)) * ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput] * uniVolumeFactor;
+					voices[voiceID].uniVoices[i].currentAngle += voices[voiceID].uniVoices[i].angleDelta;
+				}
+				break;
+			case 2:
+				outputs[0] = 0.0;
+				for (int i = 0; i < numUniVoices; i++) {
+					outputs[0] += (fmod(voices[voiceID].uniVoices[i].currentAngle, 2.0 * MathConstants<double>::pi) / (2.0 * MathConstants<double>::pi) * 2.0 - 1.0) * ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput] * uniVolumeFactor;
+					voices[voiceID].uniVoices[i].currentAngle += voices[voiceID].uniVoices[i].angleDelta;
+				}
+				break;
+			case 3:
+				outputs[0] = 0.0;
+				for (int i = 0; i < numUniVoices; i++) {
+					outputs[0] += (std::sin(voices[voiceID].uniVoices[i].currentAngle) > 0.0f ? 1.0f : -1.0f) * ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput] * uniVolumeFactor;
+					voices[voiceID].uniVoices[i].currentAngle += voices[voiceID].uniVoices[i].angleDelta;
+				}
+				break;
+			default:
+
+				break;
+			}
+		}
+		else
+			outputs[0] = 0.0;
+
+		canBeEvaluated = false;
+	}
 }

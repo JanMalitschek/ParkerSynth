@@ -76,10 +76,12 @@ void TransposeFrequencyModule::SetParameter(int id, float value) {
 }
 
 double TransposeFrequencyModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	if (inputs[0].connectedModule >= 0)
-		outputs[0] = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID) * pow(1.059463f, transKnob.getValue());
-	else
-		outputs[0] = 440.0f;
-
+	if (canBeEvaluated) {
+		if (inputs[0].connectedModule >= 0)
+			outputs[0] = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID) * pow(1.059463f, transKnob.getValue());
+		else
+			outputs[0] = 440.0f;
+		canBeEvaluated = false;
+	}
 	return outputs[outputID];
 }

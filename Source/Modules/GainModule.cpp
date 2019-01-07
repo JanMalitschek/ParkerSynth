@@ -72,10 +72,12 @@ void GainModule::SetParameter(int id, float value) {
 }
 
 double GainModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	if (inputs[0].connectedModule >= 0)
-		outputs[0] = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID) * gainKnob.getValue();
-	else
-		outputs[0] = 0.0;
-
+	if (canBeEvaluated) {
+		if (inputs[0].connectedModule >= 0)
+			outputs[0] = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID) * gainKnob.getValue();
+		else
+			outputs[0] = 0.0;
+		canBeEvaluated = false;
+	}
 	return outputs[outputID];
 }

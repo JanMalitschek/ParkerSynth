@@ -33,12 +33,15 @@ void MultiplyModule::SetParameter(int id, float value) {
 }
 
 double MultiplyModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	double a = 0.0f;
-	double b = 0.0f;
-	if (inputs[0].connectedModule >= 0)
-		a = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
-	if (inputs[1].connectedModule >= 0)
-		b = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
-
-	return a * b;
+	if (canBeEvaluated) {
+		double a = 0.0f;
+		double b = 0.0f;
+		if (inputs[0].connectedModule >= 0)
+			a = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
+		if (inputs[1].connectedModule >= 0)
+			b = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
+		outputs[0] = a * b;
+		canBeEvaluated = false;
+	}
+	return outputs[outputID];
 }

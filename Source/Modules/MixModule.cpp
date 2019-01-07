@@ -75,17 +75,19 @@ void MixModule::SetParameter(int id, float value) {
 }
 
 double MixModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	float mixFactor = mixKnob.getValue();
-	if (controls[0].connectedModule >= 0)
-		mixFactor = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID);
-	double signalA = 0.0f;
-	double signalB = 0.0f;
-	if (inputs[0].connectedModule >= 0)
-		signalA = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
-	if (inputs[1].connectedModule >= 0)
-		signalB = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
+	if (canBeEvaluated) {
+		float mixFactor = mixKnob.getValue();
+		if (controls[0].connectedModule >= 0)
+			mixFactor = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID);
+		double signalA = 0.0f;
+		double signalB = 0.0f;
+		if (inputs[0].connectedModule >= 0)
+			signalA = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
+		if (inputs[1].connectedModule >= 0)
+			signalB = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
 
-	outputs[0] = signalA + (signalB - signalA) * mixFactor;
-
+		outputs[0] = signalA + (signalB - signalA) * mixFactor;
+		canBeEvaluated = false;
+	}
 	return outputs[outputID];
 }

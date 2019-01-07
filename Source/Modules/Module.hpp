@@ -15,15 +15,6 @@ Signal
 Controls:
 Frequency
 
-Sample and Hold
-Inputs:
-Signal
-TriggerVelocity
-Ouputs:
-Value
-Controls:
-None
-
 */
 
 /*
@@ -114,6 +105,12 @@ public:
 
 	float sampleRate = 44100.0f;
 	virtual double GetResult(int midiNote, float velocity, int outputID, int voiceID) = 0;
+	virtual void GetResultIteratively(int voiceID);
+	virtual void GetResultIteratively(int midiNote, float velocity, int voiceID);
+
+	bool canBeEvaluated;
+
+	int branchID;
 
 private:
 	void DrawBackgroundHighlight(Graphics &g, Rectangle<int> bounds);

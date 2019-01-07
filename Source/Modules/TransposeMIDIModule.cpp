@@ -77,10 +77,12 @@ void TransposeMIDIModule::SetParameter(int id, float value) {
 }
 
 double TransposeMIDIModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	if (inputs[0].connectedModule >= 0)
-		outputs[0] = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID) + transKnob.getValue();
-	else
-		outputs[0] = 69;
-
+	if (canBeEvaluated) {
+		if (inputs[0].connectedModule >= 0)
+			outputs[0] = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID) + transKnob.getValue();
+		else
+			outputs[0] = 69;
+		canBeEvaluated = false;
+	}
 	return outputs[outputID];
 }

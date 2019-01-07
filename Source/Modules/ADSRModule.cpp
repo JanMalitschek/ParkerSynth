@@ -177,39 +177,80 @@ void ADSRModule::SetParameter(int id, float value) {
 }
 
 double ADSRModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	if (inputs[0].connectedModule >= 0) {
-		float gain = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
-		double result = 0.0;
-		double attack = aKnob.getValue();
-		double sustain = sKnob.getValue();
-		if (gain > 0.0) {
-			if (voices[voiceID].reset == true) {
-				voices[voiceID].time = 0.0;
-				voices[voiceID].lastGain = 0.0;
-				voices[voiceID].lastTime = 0.0;
-				voices[voiceID].reset = false;
+	if (canBeEvaluated) {
+		if (inputs[0].connectedModule >= 0) {
+			float gain = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
+			double result = 0.0;
+			double attack = aKnob.getValue();
+			double sustain = sKnob.getValue();
+			if (gain > 0.0) {
+				if (voices[voiceID].reset == true) {
+					voices[voiceID].time = 0.0;
+					voices[voiceID].lastGain = 0.0;
+					voices[voiceID].lastTime = 0.0;
+					voices[voiceID].reset = false;
+				}
+				if (voices[voiceID].time < attack) {
+					result = 1.0 * voices[voiceID].time / attack;
+					voices[voiceID].lastGain = result;
+					voices[voiceID].lastTime = voices[voiceID].time;
+				}
+				else if (voices[voiceID].time >= attack) {
+					result = jmax(1.0 - (1.0 - sustain) * ((voices[voiceID].time - attack) / dKnob.getValue()), sustain);
+					voices[voiceID].lastGain = result;
+					voices[voiceID].lastTime = voices[voiceID].time;
+				}
+				voices[voiceID].time += 1.0 / ngp->sampleRate;
 			}
-			if (voices[voiceID].time < attack) {
-				result = 1.0 * voices[voiceID].time / attack;
-				voices[voiceID].lastGain = result;
-				voices[voiceID].lastTime = voices[voiceID].time;
+			else {
+				result = jmax(voices[voiceID].lastGain - voices[voiceID].lastGain * ((voices[voiceID].time - voices[voiceID].lastTime) / rKnob.getValue()), 0.0);
+				voices[voiceID].time += 1.0 / ngp->sampleRate;
+				voices[voiceID].reset = true;
 			}
-			else if (voices[voiceID].time >= attack) {
-				result = jmax(1.0 - (1.0 - sustain) * ((voices[voiceID].time - attack) / dKnob.getValue()), sustain);
-				voices[voiceID].lastGain = result;
-				voices[voiceID].lastTime = voices[voiceID].time;
-			}
-			voices[voiceID].time += 1.0 / ngp->sampleRate;
+			outputs[0] = result;
 		}
-		else {
-			result = jmax(voices[voiceID].lastGain - voices[voiceID].lastGain * ((voices[voiceID].time - voices[voiceID].lastTime) / rKnob.getValue()), 0.0);
-			voices[voiceID].time += 1.0 / ngp->sampleRate;
-			voices[voiceID].reset = true;
-		}
-		outputs[0] = result;
+		else
+			outputs[0] = 0.0;
+		canBeEvaluated = false;
 	}
-	else
-		outputs[0] = 0.0;
-
 	return outputs[outputID];
+}
+
+void ADSRModule::GetResultIteratively(int voiceID) {
+	if (canBeEvaluated) {
+		if (inputs[0].connectedModule >= 0) {
+			float gain = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
+			double result = 0.0;
+			double attack = aKnob.getValue();
+			double sustain = sKnob.getValue();
+			if (gain > 0.0) {
+				if (voices[voiceID].reset == true) {
+					voices[voiceID].time = 0.0;
+					voices[voiceID].lastGain = 0.0;
+					voices[voiceID].lastTime = 0.0;
+					voices[voiceID].reset = false;
+				}
+				if (voices[voiceID].time < attack) {
+					result = 1.0 * voices[voiceID].time / attack;
+					voices[voiceID].lastGain = result;
+					voices[voiceID].lastTime = voices[voiceID].time;
+				}
+				else if (voices[voiceID].time >= attack) {
+					result = jmax(1.0 - (1.0 - sustain) * ((voices[voiceID].time - attack) / dKnob.getValue()), sustain);
+					voices[voiceID].lastGain = result;
+					voices[voiceID].lastTime = voices[voiceID].time;
+				}
+				voices[voiceID].time += 1.0 / ngp->sampleRate;
+			}
+			else {
+				result = jmax(voices[voiceID].lastGain - voices[voiceID].lastGain * ((voices[voiceID].time - voices[voiceID].lastTime) / rKnob.getValue()), 0.0);
+				voices[voiceID].time += 1.0 / ngp->sampleRate;
+				voices[voiceID].reset = true;
+			}
+			outputs[0] = result;
+		}
+		else
+			outputs[0] = 0.0;
+		canBeEvaluated = false;
+	}
 }

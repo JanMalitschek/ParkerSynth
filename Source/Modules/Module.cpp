@@ -13,6 +13,8 @@ Module::Module() : Component() {
 	moduleSize = Point<int>(4, 4);
 	numParameters = 0;
 	titleFontSize = 22.0f;
+	canBeEvaluated = false;
+	branchID = -1;
 }
 
 Module::Module(ModuleColorScheme colorScheme, juce::String title, int numInputs, int numOutputs, int numControls, Point<int> moduleSize, int numParameters) : Component() {
@@ -48,6 +50,8 @@ Module::Module(ModuleColorScheme colorScheme, juce::String title, int numInputs,
 	id = 0;
 	this->moduleSize = moduleSize;
 	this->numParameters = numParameters;
+	canBeEvaluated = false;
+	branchID = -1;
 }
 
 Module::~Module() {
@@ -141,4 +145,12 @@ void Module::DrawBackgroundHighlight(Graphics &g, Rectangle<int> bounds) {
 	highlight.lineTo(0, bounds.getBottom() * 0.6f);
 	highlight.lineTo(0, 0);
 	g.fillPath(highlight);
+}
+
+void Module::GetResultIteratively(int voiceID) {
+
+}
+
+void Module::GetResultIteratively(int midiNote, float velocity, int voiceID) {
+
 }

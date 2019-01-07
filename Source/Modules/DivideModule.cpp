@@ -32,15 +32,19 @@ void DivideModule::SetParameter(int id, float value) {
 }
 
 double DivideModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	double a = 0.0f;
-	double b = 0.0f;
-	if (inputs[0].connectedModule >= 0)
-		a = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
-	if (inputs[1].connectedModule >= 0)
-		b = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
+	if (canBeEvaluated) {
+		double a = 0.0f;
+		double b = 0.0f;
+		if (inputs[0].connectedModule >= 0)
+			a = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
+		if (inputs[1].connectedModule >= 0)
+			b = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
 
-	if (b != 0.0)
-		return a / b;
-	else
-		return 0.0;
+		if (b != 0.0)
+			outputs[0] = a / b;
+		else
+			outputs[0] = 0.0;
+		canBeEvaluated = false;
+	}
+	return outputs[outputID];
 }

@@ -53,3 +53,8 @@ double MIDIModule::GetResult(int midiNote, float velocity, int outputID, int voi
 
 	return outputs[outputID];
 }
+
+void MIDIModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
+	outputs[0] = velocity;
+	outputs[1] = midiNote;
+}

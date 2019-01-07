@@ -98,27 +98,29 @@ void AMRMModule::SetParameter(int id, float value) {
 }
 
 double AMRMModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	double carrSignal = 0.0;
-	double modSignal = 0.0;
-	if (inputs[0].connectedModule >= 0)
-		carrSignal = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
-	if (inputs[1].connectedModule >= 0)
-		modSignal = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
+	if (canBeEvaluated) {
+		double carrSignal = 0.0;
+		double modSignal = 0.0;
+		if (inputs[0].connectedModule >= 0)
+			carrSignal = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
+		if (inputs[1].connectedModule >= 0)
+			modSignal = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
 
-	double modFactor = 0.0;
-	if (controls[0].connectedModule >= 0) {
-		modFactor = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID);
-	}
-	else {
-		modFactor = amountKnob.getValue();
-	}
+		double modFactor = 0.0;
+		if (controls[0].connectedModule >= 0) {
+			modFactor = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID);
+		}
+		else {
+			modFactor = amountKnob.getValue();
+		}
 
-	if (modeSlider.getValue() == 0.0) {
-		outputs[0] = carrSignal + (carrSignal * abs(modSignal) - carrSignal) * modFactor;
+		if (modeSlider.getValue() == 0.0) {
+			outputs[0] = carrSignal + (carrSignal * abs(modSignal) - carrSignal) * modFactor;
+		}
+		else {
+			outputs[0] = carrSignal + (carrSignal * modSignal - carrSignal) * modFactor;
+		}
+		canBeEvaluated = false;
 	}
-	else {
-		outputs[0] = carrSignal + (carrSignal * modSignal - carrSignal) * modFactor;
-	}
-
 	return outputs[outputID];
 }

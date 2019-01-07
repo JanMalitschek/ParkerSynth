@@ -38,7 +38,14 @@ public:
 	float lastTweakedParameterValue;
 	float lastTweakedParameterInc;
 
+	//Recursive evaluation
 	double GetResult(int midiNote, float velocity, int voiceID);
+	//Iterative evaluation
+	double GetResultIteratively(int midiNote, float velocity, int voiceID);
+	std::vector<std::pair<unsigned int, unsigned int>> branches;
+	std::vector<unsigned int> history;
+
+	void EnableEvaluation();
 
 	bool canProcess;
 

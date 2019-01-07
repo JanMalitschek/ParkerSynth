@@ -136,11 +136,15 @@ void RangeModule::textEditorReturnKeyPressed(TextEditor &t) {
 }
 
 double RangeModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	double lerpAmount = 0.0f;
-	if (controls[0].connectedModule == -1)
-		lerpAmount = lerpAmountKnob.getValue();
-	else
-		lerpAmount = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID);
+	if (canBeEvaluated) {
+		double lerpAmount = 0.0f;
+		if (controls[0].connectedModule == -1)
+			lerpAmount = lerpAmountKnob.getValue();
+		else
+			lerpAmount = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID);
 
-	return valueA + (valueB - valueA) * lerpAmount;
+		outputs[0] = valueA + (valueB - valueA) * lerpAmount;
+		canBeEvaluated = false;
+	}
+	return outputs[outputID];
 }

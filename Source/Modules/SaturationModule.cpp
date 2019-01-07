@@ -103,14 +103,17 @@ void SaturationModule::SetParameter(int id, float value) {
 }
 
 double SaturationModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	double inputSignal = 0.0f;
-	if (inputs[0].connectedModule >= 0)
-		inputSignal = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
+	if (canBeEvaluated) {
+		double inputSignal = 0.0f;
+		if (inputs[0].connectedModule >= 0)
+			inputSignal = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
 
-	float slope = slopeKnob.getValue();
-	double clipped = jlimit<double>(-1.0, 1.0, inputSignal * slope);
-	double soft = (slope + 1) * (inputSignal / (1 + abs(slope * inputSignal)));
-	outputs[0] = clipped + (soft - clipped) * kneeKnob.getValue();
+		float slope = slopeKnob.getValue();
+		double clipped = jlimit<double>(-1.0, 1.0, inputSignal * slope);
+		double soft = (slope + 1) * (inputSignal / (1 + abs(slope * inputSignal)));
+		outputs[0] = clipped + (soft - clipped) * kneeKnob.getValue();
+		canBeEvaluated = false;
+	}
 
 	return outputs[outputID];
 }
