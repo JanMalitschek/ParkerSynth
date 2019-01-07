@@ -6,9 +6,12 @@ NodeGraphEditor::NodeGraphEditor() : Component()
 	mousePos = Point<int>(0, 0);
 	rawMousePos = Point<int>(0, 0);
 	lastMousePos = Point<int>(0, 0);
+	mouseOffset = Point<int>(0, 0);
 	currentModuleSize = Point<int>(4, 4);
 	currentModuleType = ModuleType::Gain;
 	currentMoveModuleID = -1;
+	moduleOffset = Point<int>(0, 0);
+	oldModuleOffset = Point<int>(0, 0);
 
 	canPlaceNode = true;
 
@@ -17,6 +20,8 @@ NodeGraphEditor::NodeGraphEditor() : Component()
 
 	splashScreen.addMouseListener(this, false);
 	addAndMakeVisible(splashScreen);
+
+	connectionsAbove = false;
 
 	setSize(800, 575);
 }
@@ -35,12 +40,7 @@ void NodeGraphEditor::paint(Graphics &g) {
 				g.setColour(Colour((uint8)255, (uint8)255, (uint8)255, (uint8)64));
 			else
 				g.setColour(Colour((uint8)255, (uint8)0, (uint8)0, (uint8)64));
-			g.fillRect(mousePos.x, mousePos.y, currentModuleSize.x * 25, currentModuleSize.y * 25);
-			if (canPlaceNode)
-				g.setColour(Colour(255, 255, 255));
-			else
-				g.setColour(Colour(255, 0, 0));
-			g.drawRect(mousePos.x, mousePos.y, currentModuleSize.x * 25, currentModuleSize.y * 25, 5);
+			g.fillRoundedRectangle(mousePos.x, mousePos.y, currentModuleSize.x * 25, currentModuleSize.y * 25, 25.0f);
 			break;
 		case Mode::ConnectNodes:
 
@@ -50,21 +50,28 @@ void NodeGraphEditor::paint(Graphics &g) {
 				g.setColour(Colour((uint8)0, (uint8)0, (uint8)255, (uint8)64));
 			else
 				g.setColour(Colour((uint8)255, (uint8)0, (uint8)0, (uint8)64));
-			g.fillRect(mousePos.x, mousePos.y, currentModuleSize.x * 25, currentModuleSize.y * 25);
-			if (canPlaceNode)
-				g.setColour(Colour(0, 0, 255));
-			else
-				g.setColour(Colour(255, 0, 0));
-			g.drawRect(mousePos.x, mousePos.y, currentModuleSize.x * 25, currentModuleSize.y * 25, 5);
+			g.fillRoundedRectangle(mousePos.x, mousePos.y, currentModuleSize.x * 25, currentModuleSize.y * 25, 25.0f);
 			break;
 		default:
 
 			break;
 	}
+
+	if (!connectionsAbove)
+		DrawConnections(g);
 }
 
 void NodeGraphEditor::paintOverChildren(Graphics &g) {
-	//drawConnections
+	if (connectionsAbove)
+		DrawConnections(g);
+}
+
+void NodeGraphEditor::SwitchConnections() {
+	connectionsAbove = !connectionsAbove;
+	repaint(0, 0, 800, 575);
+}
+
+void NodeGraphEditor::DrawConnections(Graphics &g) {
 	for (int i = 0; i < ngp->modules.size(); i++) {
 		if (ngp->modules[i] != nullptr) {
 			for (int n = 0; n < ngp->modules[i]->inputs.size(); n++) {
@@ -122,7 +129,7 @@ void NodeGraphEditor::RedrawGUI() {
 	for (int i = 0; i < ngp->modules.size(); i++) {
 		if (ngp->modules[i] != nullptr) {
 			addAndMakeVisible(ngp->modules[i]);
-			ngp->modules[i]->setBounds(ngp->modules[i]->getBounds());
+			ngp->modules[i]->setBounds(Rectangle<int>(ngp->modules[i]->getBounds().getTopLeft() + moduleOffset, ngp->modules[i]->getBounds().getBottomRight() + moduleOffset));
 			ngp->modules[i]->nge = this;
 		}
 	}
@@ -133,20 +140,42 @@ void NodeGraphEditor::resized() {
 	splashScreen.setBounds(200, 125, 400, 300);
 }
 
+void NodeGraphEditor::mouseDrag(const MouseEvent &event) {
+	/*if (mode == Mode::Idle && event.mods.isLeftButtonDown()) {
+		rawMousePos = event.getPosition();
+		mousePos.x = (int)(floor(rawMousePos.x * 0.04f) / 0.04f);
+		mousePos.y = (int)(floor(rawMousePos.y * 0.04f) / 0.04f);
+		if (mousePos != lastMousePos) {
+			mouseOffset = mousePos - lastMousePos;
+			lastMousePos = mousePos;
+			moduleOffset += mouseOffset;
+			moduleOffset.setX(jmax(jmin(moduleOffset.getX(), 100), 0));
+			moduleOffset.setY(jmax(jmin(moduleOffset.getY(), 100), 0));
+		}
+		setMouseCursor(MouseCursor::DraggingHandCursor);
+	}
+	if (oldModuleOffset != moduleOffset) {
+		for (int i = 0; i < ngp->modules.size(); i++) {
+			ngp->modules[i]->setBounds(Rectangle<int>(ngp->modules[i]->getBounds().getTopLeft() + moduleOffset, ngp->modules[i]->getBounds().getBottomRight() + moduleOffset));
+		}
+		repaint(0, 0, 800, 575);
+		oldModuleOffset = moduleOffset;
+	}*/
+}
+
 void NodeGraphEditor::mouseMove(const MouseEvent &event) {
 	rawMousePos = event.getPosition();
 	mousePos.x = (int)(floor(rawMousePos.x * 0.04f) / 0.04f);
 	mousePos.y = (int)(floor(rawMousePos.y * 0.04f) / 0.04f);
 	canPlaceNode = !CheckOverlap();
-	if(mode == Mode::PlaceNode || mode == Mode::MoveNode)
-		repaint(lastMousePos.x, lastMousePos.y, currentModuleSize.x * 25, currentModuleSize.y * 25);
+	mouseOffset = mousePos - lastMousePos;
 	lastMousePos = mousePos;
-	if(mode == Mode::ConnectNodes)
+	if(mode == Mode::ConnectNodes || mode == Mode::PlaceNode || mode == Mode::MoveNode)
 		repaint(0, 0, 800, 575);
-
 }
 
 void NodeGraphEditor::mouseUp(const MouseEvent &event) {
+	setMouseCursor(MouseCursor::NormalCursor);
 	if (canPlaceNode && mode == Mode::PlaceNode && event.mods.isLeftButtonDown()) {
 		ngp->canProcess = false;
 		switch(currentModuleType){
@@ -187,6 +216,32 @@ void NodeGraphEditor::mouseUp(const MouseEvent &event) {
 			case ModuleType::FM:
 				ngp->modules.push_back(new FMModule());
 				break;
+			case ModuleType::Range:
+				ngp->modules.push_back(new RangeModule());
+				break;
+			case ModuleType::TransposeMIDI:
+				ngp->modules.push_back(new TransposeMIDIModule());
+				break;
+			case ModuleType::TransposeFreqency:
+				ngp->modules.push_back(new TransposeFrequencyModule());
+				break;
+			case ModuleType::WhiteNoise:
+				ngp->modules.push_back(new WhiteNoiseModule());
+				break;
+			case ModuleType::Mix:
+				ngp->modules.push_back(new MixModule());
+				break;
+			case ModuleType::SampleAndHold:
+				ngp->modules.push_back(new SampleAndHoldModule());
+				break;
+			case ModuleType::Saturation:
+				ngp->modules.push_back(new SaturationModule());
+				break;
+			case ModuleType::Bitcrush:
+				ngp->modules.push_back(new BitcrushModule());
+				break;
+			case ModuleType::AMRM:
+				ngp->modules.push_back(new AMRMModule());
 			default:
 				ngp->modules.push_back(new GainModule());
 				break;
@@ -280,7 +335,7 @@ void NodeGraphEditor::AddDivideModule() {
 
 void NodeGraphEditor::AddValueModule() {
 	mode = Mode::PlaceNode;
-	currentModuleSize = Point<int>(4, 4);
+	currentModuleSize = Point<int>(4, 3);
 	currentModuleType = ModuleType::Value;
 }
 
@@ -288,6 +343,60 @@ void NodeGraphEditor::AddFMModule() {
 	mode = Mode::PlaceNode;
 	currentModuleSize = Point<int>(4, 5);
 	currentModuleType = ModuleType::FM;
+}
+
+void NodeGraphEditor::AddRangeModule() {
+	mode = Mode::PlaceNode;
+	currentModuleSize = Point<int>(4, 6);
+	currentModuleType = ModuleType::Range;
+}
+
+void NodeGraphEditor::AddTransposeMIDIModule() {
+	mode = Mode::PlaceNode;
+	currentModuleSize = Point<int>(4, 4);
+	currentModuleType = ModuleType::TransposeMIDI;
+}
+
+void NodeGraphEditor::AddTransposeFrequencyModule() {
+	mode = Mode::PlaceNode;
+	currentModuleSize = Point<int>(4, 4);
+	currentModuleType = ModuleType::TransposeFreqency;
+}
+
+void NodeGraphEditor::AddWhiteNoiseModule() {
+	mode = Mode::PlaceNode;
+	currentModuleSize = Point<int>(4, 3);
+	currentModuleType = ModuleType::WhiteNoise;
+}
+
+void NodeGraphEditor::AddMixModule() {
+	mode = Mode::PlaceNode;
+	currentModuleSize = Point<int>(4, 4);
+	currentModuleType = ModuleType::Mix;
+}
+
+void NodeGraphEditor::AddSampleAndHoldModule() {
+	mode = Mode::PlaceNode;
+	currentModuleSize = Point<int>(4, 4);
+	currentModuleType = ModuleType::SampleAndHold;
+}
+
+void NodeGraphEditor::AddSaturationModule() {
+	mode = Mode::PlaceNode;
+	currentModuleSize = Point<int>(6, 4);
+	currentModuleType = ModuleType::Saturation;
+}
+
+void NodeGraphEditor::AddBitcrushModule() {
+	mode = Mode::PlaceNode;
+	currentModuleSize = Point<int>(6, 4);
+	currentModuleType = ModuleType::Bitcrush;
+}
+
+void NodeGraphEditor::AddAMRMModule() {
+	mode = Mode::PlaceNode;
+	currentModuleSize = Point<int>(4, 5);
+	currentModuleType = ModuleType::AMRM;
 }
 
 void NodeGraphEditor::BeginConnectModule(unsigned int sourceModuleID, unsigned int sourceOutputID) {

@@ -32,6 +32,8 @@ NodeGraphProcessor::NodeGraphProcessor()
 	lastTweakedParameterInc = 0.01f;
 	lastTweakedParameterValue = 0.0;
 
+	sampleRate = 44100.0f;
+
 	saveData = StringArray();
 	saveDataSize = 0;
 
@@ -40,6 +42,12 @@ NodeGraphProcessor::NodeGraphProcessor()
 
 NodeGraphProcessor::~NodeGraphProcessor()
 {
+	for (int i = 0; i < modules.size(); i++) {
+		delete modules[i];
+	}
+	for (int i = 0; i < macros.size(); i++) {
+		delete macros[i];
+	}
 }
 
 void NodeGraphProcessor::SavePreset(bool toPresetFile) {
@@ -204,6 +212,33 @@ void NodeGraphProcessor::LoadPreset(bool fromPresetFile) {
 		}
 		else if (moduleType == "[Value]{") {
 			modules.push_back(new ValueModule());
+		}
+		else if (moduleType == "[Range]{") {
+			modules.push_back(new RangeModule());
+		}
+		else if (moduleType == "[TransM]{") {
+			modules.push_back(new TransposeMIDIModule());
+		}
+		else if (moduleType == "[TransF]{") {
+			modules.push_back(new TransposeFrequencyModule());
+		}
+		else if (moduleType == "[Noise]{") {
+			modules.push_back(new WhiteNoiseModule());
+		}
+		else if (moduleType == "[Mix]{") {
+			modules.push_back(new MixModule());
+		}
+		else if (moduleType == "[SaH]{") {
+			modules.push_back(new SampleAndHoldModule());
+		}
+		else if (moduleType == "[Saturate]{") {
+			modules.push_back(new SaturationModule());
+		}
+		else if (moduleType == "[Bitcrush]{") {
+			modules.push_back(new BitcrushModule());
+		}
+		else if (moduleType == "[AM RM]{") {
+			modules.push_back(new AMRMModule());
 		}
 		//Set Size
 		modules[currentID]->id = currentID;

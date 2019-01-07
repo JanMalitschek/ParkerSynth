@@ -2,7 +2,6 @@
 #include "..\LookAndFeel\Colors.hpp"
 
 MIDIModule::MIDIModule() : Module(ModuleColorScheme::Pink, "MIDI", 0, 2, 0, Point<int>(4, 4), 0) {
-	midiIcon = ImageFileFormat::loadFrom(BinaryData::MIDI_Icon_png, (size_t)BinaryData::MIDI_Icon_pngSize);
 	velocity.reset(44100, 0.01);
 	outputSocketButtons[0]->button.setTooltip("Velocity");
 	outputSocketButtons[0]->SetValueType(ValueType::Velocity);

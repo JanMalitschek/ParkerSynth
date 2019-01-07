@@ -3,7 +3,7 @@
 #include "LookAndFeel\ToolbarButton.hpp"
 #include "NodeGraphEditor.h"
 
-class CustomToolbar : public Component, public ButtonListener
+class CustomToolbar : public Component, public Button::Listener
 {
 public:
 	CustomToolbar();
@@ -27,6 +27,7 @@ private:
 	bool infoTabActive;
 	TextButton button_Macro;
 	bool macroTabActive;
+	TextButton button_SwitchConnections;
 	LaF_ToolbarButton laF_ToolbarButton;
 	Colour dbg;
 	
@@ -51,5 +52,14 @@ private:
 	TextButton button_module_Divide;
 	TextButton button_module_Value;
 	TextButton button_module_FM;
+	TextButton button_module_Range;
+	TextButton button_module_TransposeMIDI;
+	TextButton button_module_TransposeFrequency;
+	TextButton button_module_WhiteNoise;
+	TextButton button_module_Mix;
+	TextButton button_module_SampleAndHold;
+	TextButton button_module_Saturation;
+	TextButton button_module_Bitcrush;
+	TextButton button_module_AMRM;
 };
 

@@ -3,7 +3,7 @@
 #include "..\NodeGraphEditor.h"
 #include "..\NodeGraphProcessor.h"
 
-BasicGeneratorModule::BasicGeneratorModule() : Module(ModuleColorScheme::Blue, "Generator", 2, 1, 1, Point<int>(6, 4), 1) {
+BasicGeneratorModule::BasicGeneratorModule() : Module(ModuleColorScheme::Blue, "Generator", 2, 1, 1, Point<int>(6, 4), 3) {
 	shapeKnob.setSliderStyle(Slider::SliderStyle::LinearVertical);
 	shapeKnob.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	shapeKnob.addListener(this);
@@ -11,7 +11,6 @@ BasicGeneratorModule::BasicGeneratorModule() : Module(ModuleColorScheme::Blue, "
 	shapeKnob.setValue(0.0f);
 	shapeKnob.setLookAndFeel(&laF_Slider);
 	addAndMakeVisible(shapeKnob);
-	shapeSymbols = ImageFileFormat::loadFrom(BinaryData::Shapes_png, (size_t)BinaryData::Shapes_pngSize);
 
 	voicesKnob.setSliderStyle(Slider::SliderStyle::LinearVertical);
 	voicesKnob.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
@@ -31,12 +30,11 @@ BasicGeneratorModule::BasicGeneratorModule() : Module(ModuleColorScheme::Blue, "
 	detuneKnob.setLookAndFeel(&laF_Knob);
 	addAndMakeVisible(detuneKnob);
 
-	currentAngle = 0.0f;
-	angleDelta = (440.0 / 44100) * 2.0 * MathConstants<double>::pi;
+	oldDetune = 0.0f;
 
 	for (int i = 0; i < 9; i++) {
-		voices[i].currentAngle = 0.0f;
-		voices[i].angleDelta = (440.0 / 44100) * 2.0 * MathConstants<double>::pi;
+		/*voices[i].currentAngle = 0.0f;
+		voices[i].angleDelta = (440.0 / ngp->sampleRate) * 2.0 * MathConstants<double>::pi;*/
 		for (int n = 0; n < 5; n++) {
 			voices[i].uniVoices.push_back(UnisonVoice());
 		}
@@ -47,6 +45,7 @@ BasicGeneratorModule::BasicGeneratorModule() : Module(ModuleColorScheme::Blue, "
 	inputSocketButtons[1]->button.setTooltip("Frequency");
 	inputSocketButtons[1]->SetValueType(ValueType::Frequency);
 	outputSocketButtons[0]->button.setTooltip("Signal");
+	controlSocketButtons[0]->button.setTooltip("Detune Control\n0.0 - 2.0");
 }
 
 BasicGeneratorModule::~BasicGeneratorModule(){
@@ -107,6 +106,13 @@ float BasicGeneratorModule::GetParameter(int id) {
 	switch (id) {
 	case 0:
 		return shapeKnob.getValue();
+		break;
+	case 1:
+		return voicesKnob.getValue();
+		break;
+	case 2:
+		return detuneKnob.getValue();
+		break;
 	default:
 		return 0.0;
 	}
@@ -116,6 +122,12 @@ void BasicGeneratorModule::SetParameter(int id, float value) {
 	switch (id) {
 	case 0:
 		shapeKnob.setValue(value);
+		break;
+	case 1:
+		voicesKnob.setValue(value);
+		break;
+	case 2:
+		detuneKnob.setValue(value);
 		break;
 	default:
 		break;
@@ -129,7 +141,7 @@ void BasicGeneratorModule::CalculateUnisonVoices(float freq, int voiceID) {
 	for (int i = 0; i < numUniVoices; i++) {
 		float midiOffset = ((float)i - uniOffsetCenter) * detune;
 		float uniFrequency = freq * pow(2, midiOffset / 12.0);
-		voices[voiceID].uniVoices[i].angleDelta = (uniFrequency / 44100) * 2.0 * MathConstants<double>::pi;
+		voices[voiceID].uniVoices[i].angleDelta = (uniFrequency / ngp->sampleRate) * 2.0 * MathConstants<double>::pi;
 	}
 }
 
@@ -144,6 +156,14 @@ double BasicGeneratorModule::GetResult(int midiNote, float velocity, int outputI
 		CalculateUnisonVoices(freq, voiceID);
 		voices[voiceID].oldFrequency = freq;
 		voices[voiceID].recalculate = false;
+	}
+
+	if (controls[0].connectedModule >= 0) {
+		float currentDetune = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID);
+		if (oldDetune != currentDetune) {
+			detuneKnob.setValue(currentDetune);
+			oldDetune = currentDetune;
+		}
 	}
 
 	if (inputs[0].connectedModule >= 0) {
@@ -176,7 +196,7 @@ double BasicGeneratorModule::GetResult(int midiNote, float velocity, int outputI
 			case 3:
 				outputs[0] = 0.0;
 				for (int i = 0; i < numUniVoices; i++) {
-					outputs[0] += std::sin(voices[voiceID].currentAngle) * (ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID) > 0.0 ? 1.0 : -1.0) * uniVolumeFactor;
+					outputs[0] += (std::sin(voices[voiceID].uniVoices[i].currentAngle) > 0.0f ? 1.0f : -1.0f) * ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID) * uniVolumeFactor;
 					voices[voiceID].uniVoices[i].currentAngle += voices[voiceID].uniVoices[i].angleDelta;
 				}
 				break;
@@ -187,6 +207,5 @@ double BasicGeneratorModule::GetResult(int midiNote, float velocity, int outputI
 	}
 	else
 		outputs[0] = 0.0;
-	voices[voiceID].currentAngle += voices[voiceID].angleDelta;
 	return outputs[outputID];
 }

@@ -199,11 +199,11 @@ double ADSRModule::GetResult(int midiNote, float velocity, int outputID, int voi
 				voices[voiceID].lastGain = result;
 				voices[voiceID].lastTime = voices[voiceID].time;
 			}
-			voices[voiceID].time += 1.0 / 44100;
+			voices[voiceID].time += 1.0 / ngp->sampleRate;
 		}
 		else {
 			result = jmax(voices[voiceID].lastGain - voices[voiceID].lastGain * ((voices[voiceID].time - voices[voiceID].lastTime) / rKnob.getValue()), 0.0);
-			voices[voiceID].time += 1.0 / 44100;
+			voices[voiceID].time += 1.0 / ngp->sampleRate;
 			voices[voiceID].reset = true;
 		}
 		outputs[0] = result;

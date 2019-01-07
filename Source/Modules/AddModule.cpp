@@ -4,7 +4,7 @@
 #include "..\NodeGraphProcessor.h"
 
 AddModule::AddModule() : Module(ModuleColorScheme::Grey, "Add", 2, 1, 0, Point<int>(4, 4), 0) {
-	add_Image = ImageFileFormat::loadFrom(BinaryData::Math_Add_png, (size_t)BinaryData::Math_Add_pngSize);
+
 	inputSocketButtons[0]->button.setTooltip("Value A");
 	inputSocketButtons[0]->SetValueType(ValueType::SimpleValue);
 	inputSocketButtons[1]->button.setTooltip("Value B");
@@ -18,7 +18,7 @@ AddModule::~AddModule(){
 }
 
 void AddModule::PaintGUI(Graphics &g) {
-	g.drawImage(add_Image, 0, 0, 100, 100, 0, 0, 100, 100);
+
 }
 
 void AddModule::ResizeGUI() {

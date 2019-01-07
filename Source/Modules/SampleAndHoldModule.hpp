@@ -1,12 +1,17 @@
 #pragma once
 
 #include "Module.hpp"
-#include "..\LookAndFeel\LaF_New.hpp"
+#include "..\LookAndFeel\Knob.hpp"
 
-class GainModule : public Module, public Slider::Listener {
+struct SaHVoice {
+	bool holding = false;
+	double value = 0.0f;
+};
+
+class SampleAndHoldModule : public Module, public Slider::Listener {
 public:
-	GainModule();
-	~GainModule();
+	SampleAndHoldModule();
+	~SampleAndHoldModule();
 
 	void PaintGUI(Graphics &g) override;
 	void ResizeGUI() override;
@@ -19,7 +24,8 @@ public:
 	void SetParameter(int id, float value) override;
 
 	double GetResult(int midiNote, float velocity, int outputID, int voiceID) override;
+
 private:
-	Slider gainKnob;
-	LaF_RotarySlider laF_Knob;
+	bool holding;
+	double heldValue;
 };

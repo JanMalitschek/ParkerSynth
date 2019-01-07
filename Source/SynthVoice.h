@@ -12,6 +12,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "SynthSound.h"
 #include "NodeGraphProcessor.h"
+#include <chrono>
 
 class SynthVoice : public SynthesiserVoice {
 public:
@@ -55,6 +56,11 @@ public:
 			outputBuffer.addSample(1, sample, result);
 			++sampleStart;
 		}
+		/*auto now1 = std::chrono::system_clock::now();
+		auto now2 = std::chrono::system_clock::now();
+		auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(now2 - now1);
+		DBG(time.count());*/
+		/*lastTime = now;*/
 	}
 	NodeGraphProcessor* ngp;
 
@@ -66,4 +72,5 @@ private:
 	float currentVelocity;
 	double volume = 0.0;
 	double timeStep = 1.0 / 44100;
+	std::chrono::system_clock::time_point lastTime;
 };

@@ -4,7 +4,6 @@
 #include "..\NodeGraphProcessor.h"
 
 MultiplyModule::MultiplyModule() : Module(ModuleColorScheme::Grey, "Mul", 2, 1, 0, Point<int>(4, 4), 0) {
-	mul_Image = ImageFileFormat::loadFrom(BinaryData::Math_Multiply_png, (size_t)BinaryData::Math_Multiply_png);
 	inputSocketButtons[0]->button.setTooltip("Value A");
 	inputSocketButtons[0]->SetValueType(ValueType::SimpleValue);
 	inputSocketButtons[1]->button.setTooltip("Value B");
@@ -18,7 +17,7 @@ MultiplyModule::~MultiplyModule(){
 }
 
 void MultiplyModule::PaintGUI(Graphics &g) {
-	g.drawImage(mul_Image, 0, 0, 100, 100, 0, 0, 100, 100);
+
 }
 
 void MultiplyModule::ResizeGUI() {

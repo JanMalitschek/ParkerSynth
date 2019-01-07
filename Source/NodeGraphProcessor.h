@@ -25,6 +25,8 @@ public:
 	void LoadPreset(bool fromPresetFile = true);
 	void InitPreset();
 
+	float sampleRate = 44100.0f;
+
 	NodeGraphEditor *nge;
 
 	//Macro Linking

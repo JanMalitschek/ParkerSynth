@@ -5,7 +5,7 @@
 #include "LookAndFeel\MacroLinkButton.hpp"
 
 class NodeGraphProcessor;
-class Macro : public Component, public SliderListener, public ButtonListener
+class Macro : public Component, public Slider::Listener, public Button::Listener
 {
 public:
 	Macro();

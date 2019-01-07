@@ -3,10 +3,10 @@
 #include "Module.hpp"
 #include "..\LookAndFeel\LaF_New.hpp"
 
-class GainModule : public Module, public Slider::Listener {
+class TransposeMIDIModule : public Module, public Slider::Listener {
 public:
-	GainModule();
-	~GainModule();
+	TransposeMIDIModule();
+	~TransposeMIDIModule();
 
 	void PaintGUI(Graphics &g) override;
 	void ResizeGUI() override;
@@ -20,6 +20,6 @@ public:
 
 	double GetResult(int midiNote, float velocity, int outputID, int voiceID) override;
 private:
-	Slider gainKnob;
+	Slider transKnob;
 	LaF_RotarySlider laF_Knob;
 };

@@ -20,6 +20,10 @@ CustomToolbar::CustomToolbar() : Component(){
 	button_Macro.setLookAndFeel(&laF_ToolbarButton);
 	button_Macro.addListener(this);
 	addAndMakeVisible(button_Macro);
+	button_SwitchConnections.setButtonText("T.C.");
+	button_SwitchConnections.setLookAndFeel(&laF_ToolbarButton);
+	button_SwitchConnections.addListener(this);
+	addAndMakeVisible(button_SwitchConnections);
 	dbg = Colour(0, 0, 0);
 	presetTabActive = false;
 	moduleTabActive = false;
@@ -104,6 +108,51 @@ CustomToolbar::CustomToolbar() : Component(){
 	button_module_FM.addListener(this);
 	group_module.push_back(&button_module_FM);
 	addAndMakeVisible(button_module_FM);
+	button_module_Range.setButtonText("Range");
+	button_module_Range.setLookAndFeel(&laF_ToolbarButton);
+	button_module_Range.addListener(this);
+	group_module.push_back(&button_module_Range);
+	addAndMakeVisible(button_module_Range);
+	button_module_TransposeMIDI.setButtonText("TransM");
+	button_module_TransposeMIDI.setLookAndFeel(&laF_ToolbarButton);
+	button_module_TransposeMIDI.addListener(this);
+	group_module.push_back(&button_module_TransposeMIDI);
+	addAndMakeVisible(button_module_TransposeMIDI);
+	button_module_TransposeFrequency.setButtonText("TransF");
+	button_module_TransposeFrequency.setLookAndFeel(&laF_ToolbarButton);
+	button_module_TransposeFrequency.addListener(this);
+	group_module.push_back(&button_module_TransposeFrequency);
+	addAndMakeVisible(button_module_TransposeFrequency);
+	button_module_WhiteNoise.setButtonText("Noise");
+	button_module_WhiteNoise.setLookAndFeel(&laF_ToolbarButton);
+	button_module_WhiteNoise.addListener(this);
+	group_module.push_back(&button_module_WhiteNoise);
+	addAndMakeVisible(button_module_WhiteNoise);
+	button_module_Mix.setButtonText("Mix");
+	button_module_Mix.setLookAndFeel(&laF_ToolbarButton);
+	button_module_Mix.addListener(this);
+	group_module.push_back(&button_module_Mix);
+	addAndMakeVisible(button_module_Mix);
+	button_module_SampleAndHold.setButtonText("SaH");
+	button_module_SampleAndHold.setLookAndFeel(&laF_ToolbarButton);
+	button_module_SampleAndHold.addListener(this);
+	group_module.push_back(&button_module_SampleAndHold);
+	addAndMakeVisible(button_module_SampleAndHold);
+	button_module_Saturation.setButtonText("Saturation");
+	button_module_Saturation.setLookAndFeel(&laF_ToolbarButton);
+	button_module_Saturation.addListener(this);
+	group_module.push_back(&button_module_Saturation);
+	addAndMakeVisible(button_module_Saturation);
+	button_module_Bitcrush.setButtonText("Bitcrush");
+	button_module_Bitcrush.setLookAndFeel(&laF_ToolbarButton);
+	button_module_Bitcrush.addListener(this);
+	group_module.push_back(&button_module_Bitcrush);
+	addAndMakeVisible(button_module_Bitcrush);
+	button_module_AMRM.setButtonText("AM/RM");
+	button_module_AMRM.setLookAndFeel(&laF_ToolbarButton);
+	button_module_AMRM.addListener(this);
+	group_module.push_back(&button_module_AMRM);
+	addAndMakeVisible(button_module_AMRM);
 
 	nge = nullptr;
 	canDrawMacros = false;
@@ -126,7 +175,8 @@ void CustomToolbar::resized() {
 	button_Preset.setBounds(0, 0, 100, 25);
 	button_Node.setBounds(100, 0, 100, 25);
 	button_Macro.setBounds(200, 0, 100, 25);
-	button_Info.setBounds(500, 0, 100, 25);
+	button_Info.setBounds(600, 0, 100, 25);
+	button_SwitchConnections.setBounds(700, 0, 100, 25);
 
 	button_preset_Save.setBounds(0, 25, 100, 25);
 
@@ -235,6 +285,9 @@ void CustomToolbar::buttonClicked(Button* button) {
 	else if (button == &button_Info) {
 		AlertWindow::showMessageBox(AlertWindow::AlertIconType::NoIcon, "Save Data Size", nge->ngp->saveData[75]);
 	}
+	else if (button == &button_SwitchConnections) {
+		nge->SwitchConnections();
+	}
 	else if (button == &button_module_Gain) {
 		moduleTabActive = false;
 		this->setBounds(0, 0, 800, 25);
@@ -306,6 +359,60 @@ void CustomToolbar::buttonClicked(Button* button) {
 		this->setBounds(0, 0, 800, 25);
 		repaint(0, 25, 800, 575);
 		nge->AddFMModule();
+	}
+	else if (button == &button_module_Range) {
+		moduleTabActive = false;
+		this->setBounds(0, 0, 800, 25);
+		repaint(0, 25, 800, 575);
+		nge->AddRangeModule();
+	}
+	else if (button == &button_module_TransposeMIDI) {
+		moduleTabActive = false;
+		this->setBounds(0, 0, 800, 25);
+		repaint(0, 25, 800, 575);
+		nge->AddTransposeMIDIModule();
+	}
+	else if (button == &button_module_TransposeFrequency) {
+		moduleTabActive = false;
+		this->setBounds(0, 0, 800, 25);
+		repaint(0, 25, 800, 575);
+		nge->AddTransposeFrequencyModule();
+	}
+	else if (button == &button_module_WhiteNoise) {
+		moduleTabActive = false;
+		this->setBounds(0, 0, 800, 25);
+		repaint(0, 25, 800, 575);
+		nge->AddWhiteNoiseModule();
+	}
+	else if (button == &button_module_Mix) {
+		moduleTabActive = false;
+		this->setBounds(0, 0, 800, 25);
+		repaint(0, 25, 800, 575);
+		nge->AddMixModule();
+	}
+	else if (button == &button_module_SampleAndHold) {
+		moduleTabActive = false;
+		this->setBounds(0, 0, 800, 25);
+		repaint(0, 25, 800, 575);
+		nge->AddSampleAndHoldModule();
+	}
+	else if (button == &button_module_Saturation) {
+		moduleTabActive = false;
+		this->setBounds(0, 0, 800, 25);
+		repaint(0, 25, 800, 575);
+		nge->AddSaturationModule();
+	}
+	else if (button == &button_module_Bitcrush) {
+		moduleTabActive = false;
+		this->setBounds(0, 0, 800, 25);
+		repaint(0, 25, 800, 575);
+		nge->AddBitcrushModule();
+	}
+	else if (button == &button_module_AMRM) {
+		moduleTabActive = false;
+		this->setBounds(0, 0, 800, 25);
+		repaint(0, 25, 800, 575);
+		nge->AddAMRMModule();
 	}
 }
 

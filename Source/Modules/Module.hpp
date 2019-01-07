@@ -5,6 +5,37 @@
 #include "Socket.h"
 #include "../LookAndFeel/Colors.hpp"
 
+/*
+PLANNED MODULES:
+Biquad Filter
+Inputs:
+Signal
+Outputs:
+Signal
+Controls:
+Frequency
+
+Sample and Hold
+Inputs:
+Signal
+TriggerVelocity
+Ouputs:
+Value
+Controls:
+None
+
+*/
+
+/*
+ADDING A NEW MODULE
+1. Create New Module Class
+2. Add module to ModuleType in Module.hpp
+3. Add module to the mouseUp Callback in NGE
+4. Add AddModule function to NGE
+5. Add Button+fuctionality to the custom toolbar
+6. Add module to the LoadPreset function in NGP
+*/
+
 enum ModuleColorScheme {
 	Pink,
 	Blue,
@@ -33,13 +64,22 @@ enum ModuleType {
 	Multiply,
 	Divide,
 	Value,
-	FM
+	FM,
+	Range,
+	TransposeMIDI,
+	TransposeFreqency,
+	WhiteNoise,
+	Mix,
+	SampleAndHold,
+	Saturation,
+	Bitcrush,
+	AMRM
 };
 
 class NodeGraphEditor;
 class NodeGraphProcessor;
 
-class Module : public Component, public ButtonListener, public MouseListener {
+class Module : public Component, public Button::Listener, public MouseListener {
 public:
 	Module();
 	Module(ModuleColorScheme colorScheme, juce::String title, int numInputs, int numOutputs, int numControls, Point<int> moduleSize, int numParameters);
@@ -70,6 +110,9 @@ public:
 
 	Point<int> moduleSize;
 
+	float titleFontSize = 22.0f;
+
+	float sampleRate = 44100.0f;
 	virtual double GetResult(int midiNote, float velocity, int outputID, int voiceID) = 0;
 
 private:
@@ -77,6 +120,7 @@ private:
 
 protected:
 	Font boldFont;
+	void SetTitleFontSize(float fontSize = 22.0f);
 };
 
 #endif

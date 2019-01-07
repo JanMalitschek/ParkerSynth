@@ -1,17 +1,21 @@
 #pragma once
-
 #include "Module.hpp"
 #include "..\LookAndFeel\LaF_New.hpp"
 #include <string>
 #include "..\NumericTextFilter.h"
 
-class ValueModule : public Module, public TextEditor::Listener {
+class RangeModule : public Module, public TextEditor::Listener, public Slider::Listener
+{
 public:
-	ValueModule();
-	~ValueModule();
+	RangeModule();
+	~RangeModule();
 
 	void PaintGUI(Graphics &g) override;
 	void ResizeGUI() override;
+
+	void sliderValueChanged(Slider* slider) override;
+	void sliderDragStarted(Slider* slider) override;
+	void sliderDragEnded(Slider* slider) override;
 
 	void textEditorReturnKeyPressed(TextEditor &t);
 
@@ -19,9 +23,15 @@ public:
 	void SetParameter(int id, float value) override;
 
 	double GetResult(int midiNote, float velocity, int outputID, int voiveID) override;
+
 private:
 	LaF_TextEditor laF_TextEditor;
-	TextEditor inputField;
+	LaF_RotarySlider laF_RotarySlider;
+	TextEditor inputFieldA;
+	Slider lerpAmountKnob;
+	TextEditor inputFieldB;
 	NumericTextFilter filter;
-	float value;
+	float valueA;
+	float valueB;
 };
+

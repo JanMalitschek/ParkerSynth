@@ -3,7 +3,7 @@
 #include "..\NodeGraphEditor.h"
 #include "..\NodeGraphProcessor.h"
 
-ValueModule::ValueModule() : Module(ModuleColorScheme::Grey, "Value", 0, 1, 0, Point<int>(4, 4), 1) {
+ValueModule::ValueModule() : Module(ModuleColorScheme::Grey, "Value", 0, 1, 0, Point<int>(4, 3), 1) {
 	inputField.setMultiLine(false);
 	inputField.setCaretVisible(true);
 	inputField.setScrollbarsShown(false);
@@ -11,7 +11,7 @@ ValueModule::ValueModule() : Module(ModuleColorScheme::Grey, "Value", 0, 1, 0, P
 	inputField.setFont(boldFont);
 	inputField.setColour(TextEditor::textColourId, LINE_GREY);
 	inputField.setText("0.0", true);
-	inputField.setLookAndFeel(&laF_Knob);
+	inputField.setLookAndFeel(&laF_TextEditor);
 	inputField.addListener(this);
 	inputField.setInputFilter(&filter, false);
 	addAndMakeVisible(inputField);
@@ -31,7 +31,7 @@ void ValueModule::PaintGUI(Graphics &g) {
 }
 
 void ValueModule::ResizeGUI() {
-	inputField.setBounds(12, 38, 50, 25);
+	inputField.setBounds(25, 25, 50, 25);
 }
 
 float ValueModule::GetParameter(int id) {

@@ -3,7 +3,7 @@
 #include "Module.hpp"
 #include "..\LookAndFeel\Knob.hpp"
 
-class MtoFModule : public Module, public SliderListener {
+class MtoFModule : public Module, public Slider::Listener {
 public:
 	MtoFModule();
 	~MtoFModule();

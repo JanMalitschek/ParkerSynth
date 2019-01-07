@@ -3,7 +3,7 @@
 #include "Module.hpp"
 #include "..\LookAndFeel\LaF_New.hpp"
 
-class FMModule : public Module, public SliderListener {
+class FMModule : public Module, public Slider::Listener {
 public:
 	FMModule();
 	~FMModule();

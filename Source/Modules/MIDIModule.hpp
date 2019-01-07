@@ -3,7 +3,7 @@
 #include "Module.hpp"
 #include "..\LookAndFeel\Knob.hpp"
 
-class MIDIModule : public Module, public SliderListener {
+class MIDIModule : public Module, public Slider::Listener {
 public:
 	MIDIModule();
 	~MIDIModule();
@@ -20,6 +20,5 @@ public:
 
 	double GetResult(int midiNote, float velocity, int outputID, int voiceID) override;
 private:
-	Image midiIcon;
 	LinearSmoothedValue<float> velocity;
 };

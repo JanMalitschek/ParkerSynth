@@ -39,6 +39,7 @@ ParkerSynthAudioProcessor::ParkerSynthAudioProcessor()
 	synth.clearSounds();
 	synth.addSound(new SynthSound());
 	ngp = NodeGraphProcessor();
+	ngp.sampleRate = getSampleRate();
 	
 	for (int i = 0; i < 20; i++) {
 		ngp.macros.push_back(new Macro());
@@ -125,6 +126,7 @@ void ParkerSynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
 	ignoreUnused(samplesPerBlock);
 	lastSampleRate = sampleRate;
+	ngp.sampleRate = sampleRate;
 	synth.setCurrentPlaybackSampleRate(lastSampleRate);
 }
 

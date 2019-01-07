@@ -10,7 +10,7 @@ struct ADSRVoice {
 	bool reset;
 };
 
-class ADSRModule : public Module, public SliderListener {
+class ADSRModule : public Module, public Slider::Listener {
 public:
 	ADSRModule();
 	~ADSRModule();

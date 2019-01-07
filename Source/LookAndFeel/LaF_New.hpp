@@ -36,7 +36,7 @@ class LaF_IOSocket : public LookAndFeel_V4 {
 class LaF_ControlSocket : public LookAndFeel_V4 {
 
 	void drawButtonBackground(Graphics& g, Button& button, const Colour& backgroundColour, bool isMouseOverButton, bool isButtonDown) override {
-		g.setColour(MAIN_COLOR);
+		g.setColour(backgroundColour);
 		Path p;
 		p.startNewSubPath(6, 16);
 		p.lineTo(12, 10);
@@ -106,38 +106,38 @@ class LaF_VerticalSlider : public LookAndFeel_V4 {
 		Path value;
 		switch (style) {
 		case Slider::SliderStyle::LinearVertical:
-			startPos = Point<float>(width / 2, height - 5);
+			startPos = Point<float>(width / 2, s.getHeight() - 5);
 			endPos = Point<float>(width / 2, 5);
-			thumbPos = startPos + (endPos - startPos) * lerpAmount;
-			rail.startNewSubPath(startPos);
-			rail.lineTo(endPos);
-			value.startNewSubPath(startPos);
-			value.lineTo(thumbPos);
-			g.setColour(MODULE_RAILING);
-			g.strokePath(rail, valueStroke);
-			g.setColour(MAIN_COLOR);
-			g.strokePath(value, valueStroke);
-			g.setColour(SLIDER_THUMB);
-			g.fillEllipse(thumbPos.x - 5, thumbPos.y - 5, 10, 10);
 			break;
 		case Slider::SliderStyle::LinearHorizontal:
-
+			startPos = Point<float>(5, s.getHeight() / 2);
+			endPos = Point<float>(s.getWidth() - 5, s.getHeight() / 2);
 			break;
 		default:
 			break;
 		}
+		thumbPos = startPos + (endPos - startPos) * lerpAmount;
+		rail.startNewSubPath(startPos);
+		rail.lineTo(endPos);
+		value.startNewSubPath(startPos);
+		value.lineTo(thumbPos);
+		g.setColour(MODULE_RAILING);
+		g.strokePath(rail, valueStroke);
+		g.setColour(MAIN_COLOR);
+		g.strokePath(value, valueStroke);
+		g.setColour(SLIDER_THUMB);
+		g.fillEllipse(thumbPos.x - 5, thumbPos.y - 5, 10, 10);
 	}
 };
 
 class LaF_TextEditor : public LookAndFeel_V4 {
 	void fillTextEditorBackground(Graphics &g, int width, int height, TextEditor &t) override {
 		g.setColour(MODULE_FONT_COLOR);
-		g.fillRect(0, 0, width, height);
+		g.fillRoundedRectangle(0, 0, width, height, 5);
 	}
 
 	void drawTextEditorOutline(Graphics &g, int width, int height, TextEditor &t) override {
-		g.setColour(MODULE_FONT_COLOR);
-		g.drawRect(0, 0, width, height);
+
 	}
 };
 

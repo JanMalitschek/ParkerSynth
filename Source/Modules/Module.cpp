@@ -12,6 +12,7 @@ Module::Module() : Component() {
 	id = 0;
 	moduleSize = Point<int>(4, 4);
 	numParameters = 0;
+	titleFontSize = 22.0f;
 }
 
 Module::Module(ModuleColorScheme colorScheme, juce::String title, int numInputs, int numOutputs, int numControls, Point<int> moduleSize, int numParameters) : Component() {
@@ -50,45 +51,22 @@ Module::Module(ModuleColorScheme colorScheme, juce::String title, int numInputs,
 }
 
 Module::~Module() {
-
+	for (int i = 0; i < inputSocketButtons.size(); i++) {
+		delete inputSocketButtons[i];
+	}
+	inputSocketButtons.clear();
+	for (int i = 0; i < outputSocketButtons.size(); i++) {
+		delete outputSocketButtons[i];
+	}
+	outputSocketButtons.clear();
+	for (int i = 0; i < controlSocketButtons.size(); i++) {
+		delete controlSocketButtons[i];
+	}
+	controlSocketButtons.clear();
 }
 
 void Module::paint(Graphics &g) {
 	Rectangle<int> bounds = getLocalBounds();
-	
-	//switch (this->colorScheme) {
-	//case ModuleColorScheme::Pink:
-	//	g.setColour(BG_PINK);
-	//	g.fillRect(bounds);
-	//	
-	//	g.setColour(BG_PINK_LIGHT);
-	//	DrawBackgroundHighlight(g, bounds);
-	//	break;
-	//case ModuleColorScheme::Blue:
-	//	g.setColour(BG_BLUE);
-	//	g.fillRect(bounds);
-
-	//	g.setColour(BG_BLUE_LIGHT);
-	//	DrawBackgroundHighlight(g, bounds);
-	//	break;
-	//case ModuleColorScheme::Grey:
-	//	g.setColour(BG_GREY);
-	//	g.fillRect(bounds);
-
-	//	g.setColour(BG_GREY_LIGHT);
-	//	DrawBackgroundHighlight(g, bounds);
-	//	break;
-	//default:
-	//	break;
-	//}
-	//g.setColour(MODULE_SHADING);
-	//g.drawRect(bounds, 2.0f);
-
-	//g.setColour(Colour((uint8)255, (uint8)255, (uint8)255, (uint8)255));
-	//g.drawImage(screw, 0, 0, 25, 25, 0, 0, 25, 25);
-	//g.drawImage(screw, bounds.getRight() - 25, 0, 25, 25, 0, 0, 25, 25);
-	//g.drawImage(screw, bounds.getRight() - 25, bounds.getBottom() - 25, 25, 25, 0, 0, 25, 25);
-	//g.drawImage(screw, 0, bounds.getBottom() - 25, 25, 25, 0, 0, 25, 25);
 
 	g.setColour(MODULE_BG);
 	g.fillRoundedRectangle(12, 12, bounds.getWidth() - 25, bounds.getHeight() - 25, 10);
@@ -101,10 +79,14 @@ void Module::paint(Graphics &g) {
 	g.strokePath(corners, PathStrokeType(5.0f, PathStrokeType::JointStyle::beveled, PathStrokeType::EndCapStyle::rounded));
 
 	g.setFont(boldFont);
-	g.setFont(22.0f);
+	g.setFont(this->titleFontSize);
 	g.drawText(this->title, 25, 0, bounds.getWidth() - 50, 25, Justification::centred, false);
 
 	PaintGUI(g);
+}
+
+void Module::SetTitleFontSize(float fontSize) {
+	this->titleFontSize = fontSize;
 }
 
 void Module::resized() {

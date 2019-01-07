@@ -20,7 +20,7 @@ struct BasicGeneratorVoice{
 	bool recalculate;
 };
 
-class BasicGeneratorModule : public Module, public SliderListener {
+class BasicGeneratorModule : public Module, public Slider::Listener {
 public:
 	BasicGeneratorModule();
 	~BasicGeneratorModule();
@@ -40,9 +40,9 @@ private:
 	Slider shapeKnob;
 	LaF_RotarySlider laF_Knob;
 	LaF_VerticalSlider laF_Slider;
-	Image shapeSymbols;
 	Slider voicesKnob;
 	Slider detuneKnob;
+	float oldDetune;
 
 	BasicGeneratorVoice voices[9];
 

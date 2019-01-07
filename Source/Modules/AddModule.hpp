@@ -16,5 +16,5 @@ public:
 
 	double GetResult(int midiNote, float velocity, int outputID, int voiceID) override;
 private:
-	Image add_Image;
+
 };

@@ -12,6 +12,16 @@
 #include "Modules\DivideModule.hpp"
 #include "Modules\ValueModule.hpp"
 #include "Modules\FMModule.hpp"
+#include "Modules\RangeModule.h"
+#include "Modules\TransposeMIDIModule.hpp"
+#include "Modules\TransposeFrequencyModule.hpp"
+#include "Modules\WhiteNoiseModule.hpp"
+#include "Modules\MixModule.hpp"
+#include "Modules\SampleAndHoldModule.hpp"
+#include "Modules\SaturationModule.hpp"
+#include "Modules\BitcrushModule.hpp"
+#include "Modules\AMRMModule.hpp"
+
 #include "NodeGraphProcessor.h"
 #include "LookAndFeel\ToolbarButton.hpp"
 #include "Splashscreen.h"
@@ -36,6 +46,7 @@ public:
 	void mouseMove(const MouseEvent &event);
 	void mouseUp(const MouseEvent &event);
 	void mouseDown(const MouseEvent &event);
+	void mouseDrag(const MouseEvent &event);
 
 	Mode mode;
 	void BeginConnectModule(unsigned int sourceModuleID, unsigned int sourceOutputID);
@@ -56,17 +67,31 @@ public:
 	void AddDivideModule();
 	void AddValueModule();
 	void AddFMModule();
+	void AddRangeModule();
+	void AddTransposeMIDIModule();
+	void AddTransposeFrequencyModule();
+	void AddWhiteNoiseModule();
+	void AddMixModule();
+	void AddSampleAndHoldModule();
+	void AddSaturationModule();
+	void AddBitcrushModule();
+	void AddAMRMModule();
 
 	NodeGraphProcessor* ngp;
 
 	void RedrawGUI();
 
+	void SwitchConnections();
+
 private:
 	Point<int> mousePos;
 	Point<int> rawMousePos;
 	Point<int> lastMousePos;
+	Point<int> mouseOffset;
 	Point<int> currentModuleSize;
 	ModuleType currentModuleType;
+	Point<int> moduleOffset;
+	Point<int> oldModuleOffset;
 
 	unsigned int currentSourceModuleID;
 	unsigned int currentSourceOutputID;
@@ -81,6 +106,8 @@ private:
 	CustomSplashscreen splashScreen;
 
 	void DrawBezierCurve(Graphics &g, Point<float> start, Point<float> control0, Point<float> control1, Point<float> end);
+	void DrawConnections(Graphics &g);
+	bool connectionsAbove;
 };
 
 #endif

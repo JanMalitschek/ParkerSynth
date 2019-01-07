@@ -4,7 +4,6 @@
 #include "..\NodeGraphProcessor.h"
 
 DivideModule::DivideModule() : Module(ModuleColorScheme::Grey, "Div", 2, 1, 0, Point<int>(4, 4), 0) {
-	div_Image = ImageFileFormat::loadFrom(BinaryData::Math_Divide_png, (size_t)BinaryData::Math_Divide_png);
 	inputSocketButtons[0]->button.setTooltip("Value A");
 	inputSocketButtons[0]->SetValueType(ValueType::SimpleValue);
 	inputSocketButtons[1]->button.setTooltip("Value B");
@@ -18,7 +17,6 @@ DivideModule::~DivideModule(){
 }
 
 void DivideModule::PaintGUI(Graphics &g) {
-	g.drawImage(div_Image, 0, 0, 100, 100, 0, 0, 100, 100);
 }
 
 void DivideModule::ResizeGUI() {
