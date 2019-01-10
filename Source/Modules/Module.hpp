@@ -64,7 +64,8 @@ enum ModuleType {
 	SampleAndHold,
 	Saturation,
 	Bitcrush,
-	AMRM
+	AMRM,
+	Filter
 };
 
 class NodeGraphEditor;

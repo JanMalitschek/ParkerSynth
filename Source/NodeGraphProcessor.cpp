@@ -247,6 +247,9 @@ void NodeGraphProcessor::LoadPreset(bool fromPresetFile) {
 		else if (moduleType == "[AM RM]{") {
 			modules.push_back(new AMRMModule());
 		}
+		else if (moduleType == "[Filter]{") {
+			modules.push_back(new FilterModule());
+		}
 		//Set Size
 		modules[currentID]->id = currentID;
 		modules[currentID]->setBounds(std::stoi(lines[currentLine + 4].toStdString()), std::stoi(lines[currentLine + 5].toStdString()), modules[currentID]->moduleSize.x * 25, modules[currentID]->moduleSize.y * 25);

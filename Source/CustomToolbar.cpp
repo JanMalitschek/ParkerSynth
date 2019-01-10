@@ -153,6 +153,11 @@ CustomToolbar::CustomToolbar() : Component(){
 	button_module_AMRM.addListener(this);
 	group_module.push_back(&button_module_AMRM);
 	addAndMakeVisible(button_module_AMRM);
+	button_module_Filter.setButtonText("Filter");
+	button_module_Filter.setLookAndFeel(&laF_ToolbarButton);
+	button_module_Filter.addListener(this);
+	group_module.push_back(&button_module_Filter);
+	addAndMakeVisible(button_module_Filter);
 
 	nge = nullptr;
 	canDrawMacros = false;
@@ -413,6 +418,12 @@ void CustomToolbar::buttonClicked(Button* button) {
 		this->setBounds(0, 0, 800, 25);
 		repaint(0, 25, 800, 575);
 		nge->AddAMRMModule();
+	}
+	else if (button == &button_module_Filter) {
+		moduleTabActive = false;
+		this->setBounds(0, 0, 800, 25);
+		repaint(0, 25, 800, 575);
+		nge->AddFilterModule();
 	}
 }
 

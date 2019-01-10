@@ -70,7 +70,7 @@ public:
 private:
 	double frequency;
 	int currentMidiNote;
-	float currentVelocity;
+	float currentVelocity = 0.0;
 	double volume = 0.0;
 	double timeStep = 1.0 / 44100;
 	std::chrono::system_clock::time_point lastTime;

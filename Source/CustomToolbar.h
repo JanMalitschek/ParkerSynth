@@ -61,5 +61,6 @@ private:
 	TextButton button_module_Saturation;
 	TextButton button_module_Bitcrush;
 	TextButton button_module_AMRM;
+	TextButton button_module_Filter;
 };
 

@@ -18,8 +18,8 @@ NodeGraphEditor::NodeGraphEditor() : Component()
 	tooltips.setLookAndFeel(&laF_ToolbarButton);
 	addAndMakeVisible(tooltips);
 
-	splashScreen.addMouseListener(this, false);
-	addAndMakeVisible(splashScreen);
+	/*splashScreen.addMouseListener(this, false);
+	addAndMakeVisible(splashScreen);*/
 
 	connectionsAbove = false;
 
@@ -137,7 +137,7 @@ void NodeGraphEditor::RedrawGUI() {
 }
 
 void NodeGraphEditor::resized() {
-	splashScreen.setBounds(200, 125, 400, 300);
+	//splashScreen.setBounds(200, 125, 400, 300);
 }
 
 void NodeGraphEditor::mouseDrag(const MouseEvent &event) {
@@ -243,6 +243,9 @@ void NodeGraphEditor::mouseUp(const MouseEvent &event) {
 			case ModuleType::AMRM:
 				ngp->modules.push_back(new AMRMModule());
 				break;
+			case ModuleType::Filter:
+				ngp->modules.push_back(new FilterModule());
+				break;
 			default:
 				ngp->modules.push_back(new GainModule());
 				break;
@@ -267,8 +270,8 @@ void NodeGraphEditor::mouseUp(const MouseEvent &event) {
 }
 
 void NodeGraphEditor::mouseDown(const MouseEvent &event) {
-	splashScreen.setVisible(false);
-	splashScreen.setEnabled(false);
+	/*splashScreen.setVisible(false);
+	splashScreen.setEnabled(false);*/
 }
 
 void NodeGraphEditor::AddGainModule() {
@@ -398,6 +401,12 @@ void NodeGraphEditor::AddAMRMModule() {
 	mode = Mode::PlaceNode;
 	currentModuleSize = Point<int>(4, 5);
 	currentModuleType = ModuleType::AMRM;
+}
+
+void NodeGraphEditor::AddFilterModule() {
+	mode = Mode::PlaceNode;
+	currentModuleSize = Point<int>(8, 5);
+	currentModuleType = ModuleType::Filter;
 }
 
 void NodeGraphEditor::BeginConnectModule(unsigned int sourceModuleID, unsigned int sourceOutputID) {

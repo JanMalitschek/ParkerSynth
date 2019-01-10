@@ -21,6 +21,7 @@
 #include "Modules\SaturationModule.hpp"
 #include "Modules\BitcrushModule.hpp"
 #include "Modules\AMRMModule.hpp"
+#include "Modules\FilterModule.hpp"
 
 #include "NodeGraphProcessor.h"
 #include "LookAndFeel\ToolbarButton.hpp"
@@ -76,6 +77,7 @@ public:
 	void AddSaturationModule();
 	void AddBitcrushModule();
 	void AddAMRMModule();
+	void AddFilterModule();
 
 	NodeGraphProcessor* ngp;
 
@@ -103,7 +105,7 @@ private:
 	LaF_ToolbarButton laF_ToolbarButton;
 	TooltipWindow tooltips;
 
-	CustomSplashscreen splashScreen;
+	//CustomSplashscreen splashScreen;
 
 	void DrawBezierCurve(Graphics &g, Point<float> start, Point<float> control0, Point<float> control1, Point<float> end);
 	void DrawConnections(Graphics &g);
