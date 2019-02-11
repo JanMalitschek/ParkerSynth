@@ -10,6 +10,7 @@ BasicGeneratorModule::BasicGeneratorModule() : Module(ModuleColorScheme::Blue, "
 	shapeKnob.setRange(0.0f, 3.0f, 1.0f);
 	shapeKnob.setValue(0.0f);
 	shapeKnob.setLookAndFeel(&laF_Slider);
+	shapeKnob.setTooltip("Shape\nSine - Triangle - Saw - Square");
 	addAndMakeVisible(shapeKnob);
 
 	voicesKnob.setSliderStyle(Slider::SliderStyle::LinearVertical);
@@ -18,6 +19,7 @@ BasicGeneratorModule::BasicGeneratorModule() : Module(ModuleColorScheme::Blue, "
 	voicesKnob.setRange(1.0f, 5.0f, 1.0f);
 	voicesKnob.setValue(1.0f);
 	voicesKnob.setLookAndFeel(&laF_Slider);
+	voicesKnob.setTooltip("Voices\n1 - 5");
 	addAndMakeVisible(voicesKnob);
 
 	detuneKnob.setColour(detuneKnob.backgroundColourId, KNOB_BLUE);
@@ -28,6 +30,7 @@ BasicGeneratorModule::BasicGeneratorModule() : Module(ModuleColorScheme::Blue, "
 	detuneKnob.setRange(0.0f, 2.0f, 0.01f);
 	detuneKnob.setValue(0.0f);
 	detuneKnob.setLookAndFeel(&laF_Knob);
+	detuneKnob.setTooltip("Detune\n0.0 - 2.0");
 	addAndMakeVisible(detuneKnob);
 
 	oldDetune = 0.0f;

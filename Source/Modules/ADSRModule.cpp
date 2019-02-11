@@ -12,6 +12,7 @@ ADSRModule::ADSRModule() : Module(ModuleColorScheme::Blue, "ADSR", 1, 1, 0, Poin
 	aKnob.setRange(0.0f, 5.0f, 0.01f);
 	aKnob.setValue(0.5f);
 	aKnob.setLookAndFeel(&laF_Knob);
+	aKnob.setTooltip("Attack\n0.0 - 5.0");
 	addAndMakeVisible(aKnob);
 	dKnob.setColour(dKnob.backgroundColourId, KNOB_BLUE);
 	dKnob.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
@@ -21,6 +22,7 @@ ADSRModule::ADSRModule() : Module(ModuleColorScheme::Blue, "ADSR", 1, 1, 0, Poin
 	dKnob.setRange(0.0f, 5.0f, 0.01f);
 	dKnob.setValue(0.5f);
 	dKnob.setLookAndFeel(&laF_Knob);
+	dKnob.setTooltip("Decay\n0.0 - 5.0");
 	addAndMakeVisible(dKnob);
 	sKnob.setColour(sKnob.backgroundColourId, KNOB_BLUE);
 	sKnob.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
@@ -30,6 +32,7 @@ ADSRModule::ADSRModule() : Module(ModuleColorScheme::Blue, "ADSR", 1, 1, 0, Poin
 	sKnob.setRange(0.0f, 1.0f, 0.01f);
 	sKnob.setValue(0.5f);
 	sKnob.setLookAndFeel(&laF_Knob);
+	sKnob.setTooltip("Sustain\n0.0 - 1.0");
 	addAndMakeVisible(sKnob);
 	rKnob.setColour(rKnob.backgroundColourId, KNOB_BLUE);
 	rKnob.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
@@ -39,6 +42,7 @@ ADSRModule::ADSRModule() : Module(ModuleColorScheme::Blue, "ADSR", 1, 1, 0, Poin
 	rKnob.setRange(0.0f, 5.0f, 0.01f);
 	rKnob.setValue(1.0f);
 	rKnob.setLookAndFeel(&laF_Knob);
+	rKnob.setTooltip("Release\n0.0 - 5.0");
 	addAndMakeVisible(rKnob);
 
 	for (int i = 0; i < 9; i++) {
@@ -58,19 +62,14 @@ ADSRModule::~ADSRModule(){
 }
 
 void ADSRModule::PaintGUI(Graphics &g) {
-	g.setFont(boldFont);
-	g.setColour(MODULE_FONT_COLOR);
-	g.drawFittedText("A", 25, 63, 50, 25, Justification::centred, 1);
-	g.drawFittedText("D", 75, 63, 50, 25, Justification::centred, 1);
-	g.drawFittedText("S", 125, 63, 50, 25, Justification::centred, 1);
-	g.drawFittedText("R", 175, 63, 50, 25, Justification::centred, 1);
+	
 }
 
 void ADSRModule::ResizeGUI() {
-	aKnob.setBounds(25, 25, 50, 50);
-	dKnob.setBounds(75, 25, 50, 50);
-	sKnob.setBounds(125, 25, 50, 50);
-	rKnob.setBounds(175, 25, 50, 50);
+	aKnob.setBounds(UtPX(1), UtPY(1), UtPX(2), UtPY(2));
+	dKnob.setBounds(UtPX(3), UtPY(1), UtPX(2), UtPY(2));
+	sKnob.setBounds(UtPX(5), UtPY(1), UtPX(2), UtPY(2));
+	rKnob.setBounds(UtPX(7), UtPY(1), UtPX(2), UtPY(2));
 }
 
 void ADSRModule::sliderValueChanged(Slider* slider) {

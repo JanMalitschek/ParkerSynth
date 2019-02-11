@@ -11,6 +11,7 @@ SaturationModule::SaturationModule() : Module(ModuleColorScheme::Grey, "Saturate
 	slopeKnob.setRange(1.0f, 100.0f);
 	slopeKnob.setValue(1.0f);
 	slopeKnob.setLookAndFeel(&laF_Knob);
+	slopeKnob.setTooltip("Slope\n1.0 - 100.0");
 	addAndMakeVisible(slopeKnob);
 
 	kneeKnob.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
@@ -20,6 +21,7 @@ SaturationModule::SaturationModule() : Module(ModuleColorScheme::Grey, "Saturate
 	kneeKnob.setRange(0.0f, 1.0f);
 	kneeKnob.setValue(0.0f);
 	kneeKnob.setLookAndFeel(&laF_Knob);
+	kneeKnob.setTooltip("Knee\n0.0 - 1.0");
 	addAndMakeVisible(kneeKnob);
 
 	inputSocketButtons[0]->button.setTooltip("Signal");

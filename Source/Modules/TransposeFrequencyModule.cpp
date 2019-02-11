@@ -11,6 +11,7 @@ TransposeFrequencyModule::TransposeFrequencyModule() : Module(ModuleColorScheme:
 	transKnob.setRange(-12.0f, 12.0f, 1.0f);
 	transKnob.setValue(0.0f);
 	transKnob.setLookAndFeel(&laF_Knob);
+	transKnob.setTooltip("Transposition\n-12.0st - 12.0st");
 	addAndMakeVisible(transKnob);
 	inputSocketButtons[0]->button.setTooltip("Frequency");
 	inputSocketButtons[0]->SetValueType(ValueType::Frequency);

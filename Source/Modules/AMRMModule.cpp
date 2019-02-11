@@ -11,6 +11,7 @@ AMRMModule::AMRMModule() : Module(ModuleColorScheme::Grey, "AM RM", 2, 1, 1, Poi
 	amountKnob.setRange(0.0f, 1.0f);
 	amountKnob.setValue(0.0f);
 	amountKnob.setLookAndFeel(&laF_Knob);
+	amountKnob.setTooltip("Amount\n0.0 - 1.0");
 	addAndMakeVisible(amountKnob);
 
 	modeSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
@@ -19,6 +20,7 @@ AMRMModule::AMRMModule() : Module(ModuleColorScheme::Grey, "AM RM", 2, 1, 1, Poi
 	modeSlider.setRange(0.0f, 1.0f, 1.0f);
 	modeSlider.setValue(0.0f);
 	modeSlider.setLookAndFeel(&laF_Slider);
+	modeSlider.setTooltip("Mode\nAM - RM");
 	addAndMakeVisible(modeSlider);
 
 	inputSocketButtons[0]->button.setTooltip("Carrier Signal");

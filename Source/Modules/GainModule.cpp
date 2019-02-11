@@ -11,6 +11,7 @@ GainModule::GainModule() : Module(ModuleColorScheme::Grey, "Gain", 1, 1, 0, Poin
 	gainKnob.setRange(0.0f, 2.0f, 0.01f);
 	gainKnob.setValue(1.0f);
 	gainKnob.setLookAndFeel(&laF_Knob);
+	gainKnob.setTooltip("Gain\n0.0 - 2.0");
 	addAndMakeVisible(gainKnob);
 	inputSocketButtons[0]->button.setTooltip("Signal");
 	outputSocketButtons[0]->button.setTooltip("Signal");

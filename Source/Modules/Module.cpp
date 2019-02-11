@@ -154,3 +154,11 @@ void Module::GetResultIteratively(int voiceID) {
 void Module::GetResultIteratively(int midiNote, float velocity, int voiceID) {
 
 }
+
+int Module::UtPX(int unit) {
+	return (getWidth() / this->moduleSize.x) * unit;
+}
+
+int Module::UtPY(int unit) {
+	return (getHeight() / this->moduleSize.y) * unit;
+}

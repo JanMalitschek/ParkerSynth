@@ -12,6 +12,7 @@ FMModule::FMModule() : Module(ModuleColorScheme::Grey, "FM", 3, 1, 1, Point<int>
 	fmKnob.setRange(0.0f, 32.0f, 0.01f);
 	fmKnob.setValue(1.0f);
 	fmKnob.setLookAndFeel(&laF_Knob);
+	fmKnob.setTooltip("FM\n0.0 - 32.0");
 	addAndMakeVisible(fmKnob);
 	inputSocketButtons[0]->button.setTooltip("Carrier Frequency");
 	inputSocketButtons[0]->SetValueType(ValueType::Frequency);

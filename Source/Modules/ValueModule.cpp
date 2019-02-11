@@ -14,6 +14,7 @@ ValueModule::ValueModule() : Module(ModuleColorScheme::Grey, "Value", 0, 1, 0, P
 	inputField.setLookAndFeel(&laF_TextEditor);
 	inputField.addListener(this);
 	inputField.setInputFilter(&filter, false);
+	inputField.setTooltip("Value");
 	addAndMakeVisible(inputField);
 
 	value = 0.0f;

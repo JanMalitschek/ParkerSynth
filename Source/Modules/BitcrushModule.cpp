@@ -12,6 +12,7 @@ BitcrushModule::BitcrushModule() : Module(ModuleColorScheme::Grey, "Bitcrush", 1
 	depthKnob.setValue(0.0f);
 	depthKnob.setSkewFactor(2.0f);
 	depthKnob.setLookAndFeel(&laF_Knob);
+	depthKnob.setTooltip("Bit Depth\n100% - 0.005%");
 	addAndMakeVisible(depthKnob);
 
 	downsampleKnob.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
@@ -22,6 +23,7 @@ BitcrushModule::BitcrushModule() : Module(ModuleColorScheme::Grey, "Bitcrush", 1
 	downsampleKnob.setValue(0.0f);
 	downsampleKnob.setSkewFactor(0.1f);
 	downsampleKnob.setLookAndFeel(&laF_Knob);
+	downsampleKnob.setTooltip("Samplerate\n100% - 0.001%");
 	addAndMakeVisible(downsampleKnob);
 
 	inputSocketButtons[0]->button.setTooltip("Signal");

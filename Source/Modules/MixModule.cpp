@@ -11,6 +11,7 @@ MixModule::MixModule() : Module(ModuleColorScheme::Grey, "Mix", 2, 1, 1, Point<i
 	mixKnob.setRange(0.0f, 1.0f, 0.0f);
 	mixKnob.setValue(0.0f);
 	mixKnob.setLookAndFeel(&laF_Knob);
+	mixKnob.setTooltip("Mix\nSignal A - Signal B");
 	addAndMakeVisible(mixKnob);
 	inputSocketButtons[0]->button.setTooltip("SignalA");
 	inputSocketButtons[1]->button.setTooltip("SignalB");

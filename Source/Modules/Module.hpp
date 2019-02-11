@@ -113,6 +113,9 @@ public:
 
 	int branchID;
 
+	inline int UtPX(int unit);
+	inline int UtPY(int unit);
+
 private:
 	void DrawBackgroundHighlight(Graphics &g, Rectangle<int> bounds);
 

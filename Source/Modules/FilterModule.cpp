@@ -14,6 +14,7 @@ FilterModule::FilterModule() : Module(ModuleColorScheme::Grey, "Filter", 1, 1, 1
 	cutoffKnob.setRange(0.01f, 0.5f);
 	cutoffKnob.setValue(0.01f);
 	cutoffKnob.setLookAndFeel(&laF_Knob);
+	cutoffKnob.setTooltip("Cutoff\n1hz - 20khz");
 	addAndMakeVisible(cutoffKnob);
 	
 	gainKnob.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
@@ -23,6 +24,7 @@ FilterModule::FilterModule() : Module(ModuleColorScheme::Grey, "Filter", 1, 1, 1
 	gainKnob.setRange(-10.0f, 10.0f);
 	gainKnob.setValue(0.0f);
 	gainKnob.setLookAndFeel(&laF_Knob);
+	gainKnob.setTooltip("Gain\n-10.0 - 10.0");
 	addAndMakeVisible(gainKnob);
 
 	qKnob.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
@@ -32,6 +34,7 @@ FilterModule::FilterModule() : Module(ModuleColorScheme::Grey, "Filter", 1, 1, 1
 	qKnob.setRange(0.1f, 10.0f);
 	qKnob.setValue(1.0f);
 	qKnob.setLookAndFeel(&laF_Knob);
+	qKnob.setTooltip("Q\n0.1 - 10.0");
 	addAndMakeVisible(qKnob);
 
 	filterTypeSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
@@ -40,6 +43,7 @@ FilterModule::FilterModule() : Module(ModuleColorScheme::Grey, "Filter", 1, 1, 1
 	filterTypeSlider.setRange(1.0f, 3.0f, 1.0f);
 	filterTypeSlider.setValue(1.0f);
 	filterTypeSlider.setLookAndFeel(&laF_Slider);
+	filterTypeSlider.setTooltip("Type\nLP - BP - HP");
 	addAndMakeVisible(filterTypeSlider);
 
 	inputSocketButtons[0]->button.setTooltip("Signal");

@@ -13,6 +13,7 @@ RangeModule::RangeModule() : Module(ModuleColorScheme::Grey, "Range", 0, 1, 1, P
 	inputFieldA.setLookAndFeel(&laF_TextEditor);
 	inputFieldA.addListener(this);
 	inputFieldA.setInputFilter(&filter, false);
+	inputFieldA.setTooltip("Value A");
 	addAndMakeVisible(inputFieldA);
 
 	inputFieldB.setMultiLine(false);
@@ -25,6 +26,7 @@ RangeModule::RangeModule() : Module(ModuleColorScheme::Grey, "Range", 0, 1, 1, P
 	inputFieldB.setLookAndFeel(&laF_TextEditor);
 	inputFieldB.addListener(this);
 	inputFieldB.setInputFilter(&filter, false);
+	inputFieldB.setTooltip("Value B");
 	addAndMakeVisible(inputFieldB);
 
 	lerpAmountKnob.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
@@ -34,6 +36,7 @@ RangeModule::RangeModule() : Module(ModuleColorScheme::Grey, "Range", 0, 1, 1, P
 	lerpAmountKnob.setRange(0.0f, 1.0f, 0.0f);
 	lerpAmountKnob.setValue(0.0f);
 	lerpAmountKnob.setLookAndFeel(&laF_RotarySlider);
+	lerpAmountKnob.setTooltip("Mix\nValue A - Value B");
 	addAndMakeVisible(lerpAmountKnob);
 
 	valueA = 0.0f;
