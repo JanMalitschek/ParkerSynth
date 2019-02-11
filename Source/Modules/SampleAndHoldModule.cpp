@@ -65,3 +65,23 @@ double SampleAndHoldModule::GetResult(int midiNote, float velocity, int outputID
 	}
 	return outputs[outputID];
 }
+
+void SampleAndHoldModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
+	double signal = 0.0f;
+	float triggerValue = 0.0f;
+	if (inputs[0].connectedModule >= 0) {
+		signal = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
+	}
+	if (inputs[1].connectedModule >= 0) {
+		triggerValue = ngp->modules[inputs[1].connectedModule]->outputs[inputs[1].connectedOutput];
+	}
+	if (triggerValue > 0.0f && !holding) {
+		holding = true;
+		heldValue = signal;
+	}
+	if (triggerValue <= 0.0f) {
+		holding = false;
+		heldValue = 0.0f;
+	}
+	outputs[0] = heldValue;
+}

@@ -45,3 +45,13 @@ double MultiplyModule::GetResult(int midiNote, float velocity, int outputID, int
 	}
 	return outputs[outputID];
 }
+
+void MultiplyModule::GetResultIteratively(int midiNote, float velocity, int voiveID) {
+	double a = 0.0f;
+	double b = 0.0f;
+	if (inputs[0].connectedModule >= 0)
+		a = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
+	if (inputs[1].connectedModule >= 0)
+		b = ngp->modules[inputs[1].connectedModule]->outputs[inputs[1].connectedOutput];
+	outputs[0] = a * b;
+}

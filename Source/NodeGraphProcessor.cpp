@@ -25,6 +25,8 @@ NodeGraphProcessor::NodeGraphProcessor()
 	branches = std::vector<std::pair<unsigned int, unsigned int>>();
 	history = std::vector<unsigned int>();
 
+	evaluationList = std::vector<int>();
+
 	macros = std::vector<Macro*>();
 
 	lastTweakedModule = -1;
@@ -331,6 +333,9 @@ void NodeGraphProcessor::InitPreset() {
 
 double NodeGraphProcessor::GetResult(int midiNote, float velocity, int voiceID) {
 	if (canProcess && outputModuleID >= 0) {
+		for (auto it : this->modules) {
+			it->canBeEvaluated = true;
+		}
 		return modules[outputModuleID]->GetResult(midiNote, velocity, 0, voiceID);
 	}
 	else
@@ -338,59 +343,66 @@ double NodeGraphProcessor::GetResult(int midiNote, float velocity, int voiceID) 
 }
 
 double NodeGraphProcessor::GetResultIteratively(int midiNote, float velocity, int voiceID) {
-	if (canProcess && outputModuleID >= 0) {
-		branches.clear();
-		history.clear();
-		int historyCounter = 0;
-		unsigned int currentModuleID = outputModuleID;
-		//Find Roots and remember all branches along the way
-		while (modules[outputModuleID]->canBeEvaluated) {
-
-			while (modules[currentModuleID]->inputs.size() > 0 && modules[currentModuleID]->canBeEvaluated) {
-				history.push_back(currentModuleID);
-				//Is it a branch?
-				if (modules[currentModuleID]->inputs.size() > 1) {
-					//Is it an undiscorvered branch?
-					if (modules[currentModuleID]->branchID == -1) {
-						branches.push_back(std::pair<unsigned int, unsigned int>(currentModuleID, 0));
-						modules[currentModuleID]->branchID = branches.size() - 1;
-					}
-					else {
-						branches[modules[currentModuleID]->branchID].second++;
-						//Is the branch complete / may it be evaluated?
-						if (branches[modules[currentModuleID]->branchID].second >= modules[currentModuleID]->inputs.size()) {
-							break;
-						}
-					}
-					currentModuleID = modules[branches.back().first]->inputs[branches.back().second].connectedModule;
-				}
-				else {
-					currentModuleID = modules[currentModuleID]->inputs[0].connectedModule;
-				}
-			}
-			if (modules[currentModuleID]->canBeEvaluated) {
-				modules[currentModuleID]->GetResultIteratively(midiNote, velocity, voiceID);
-				modules[currentModuleID]->canBeEvaluated = false;
-			}
-			historyCounter = history.size() - 1;
-			currentModuleID = history[historyCounter];
-			while (modules[currentModuleID]->branchID == -1) {
-				modules[currentModuleID]->GetResultIteratively(voiceID);
-				modules[currentModuleID]->canBeEvaluated = false;
-				if (historyCounter > 0) {
-					historyCounter--;
-					currentModuleID = history[historyCounter];
-				}
-				else {
-					break;
-				}
-			}
-			history.erase(history.begin() + historyCounter, history.end());
-		}
-		return modules[modules[outputModuleID]->inputs[0].connectedModule]->outputs[0];
+	for (int i = 0; i < evaluationList.size(); i++) {
+		modules[evaluationList[i]]->GetResultIteratively(midiNote, velocity, voiceID);
 	}
-	else
-		return 0.0;
+	return modules[modules[outputModuleID]->inputs[0].connectedModule]->outputs[modules[outputModuleID]->inputs[0].connectedOutput];
+}
+
+void NodeGraphProcessor::RecompileNodeTree() {
+	evaluationList.clear();
+	branches.clear();
+	history.clear();
+	int historyCounter = 0;
+	unsigned int currentModuleID = outputModuleID;
+	for (auto it : this->modules) {
+		it->canBeEvaluated = true;
+		it->branchID = -1;
+	}
+	//Find Roots and remember all branches along the way
+	while (modules[outputModuleID]->canBeEvaluated) {
+
+		while (modules[currentModuleID]->inputs.size() > 0 && modules[currentModuleID]->canBeEvaluated) {
+			history.push_back(currentModuleID);
+			//Is it a branch?
+			if (modules[currentModuleID]->inputs.size() > 1) {
+				//Is it an undiscorvered branch?
+				if (modules[currentModuleID]->branchID == -1) {
+					branches.push_back(std::pair<unsigned int, unsigned int>(currentModuleID, 0));
+					modules[currentModuleID]->branchID = branches.size() - 1;
+				}
+				else {
+					branches[modules[currentModuleID]->branchID].second++;
+					//Is the branch complete / may it be evaluated?
+					if (branches[modules[currentModuleID]->branchID].second >= modules[currentModuleID]->inputs.size()) {
+						break;
+					}
+				}
+				currentModuleID = modules[branches[modules[currentModuleID]->branchID].first]->inputs[branches[modules[currentModuleID]->branchID].second].connectedModule;
+			}
+			else {
+				currentModuleID = modules[currentModuleID]->inputs[0].connectedModule;
+			}
+		}
+		if (modules[currentModuleID]->canBeEvaluated) {
+			evaluationList.push_back(currentModuleID);
+			modules[currentModuleID]->canBeEvaluated = false;
+		}
+		historyCounter = history.size() - 1;
+		currentModuleID = history[historyCounter];
+		while (modules[currentModuleID]->branchID == -1) {
+			evaluationList.push_back(currentModuleID);
+			modules[currentModuleID]->canBeEvaluated = false;
+			if (historyCounter > 0) {
+				historyCounter--;
+				currentModuleID = history[historyCounter];
+			}
+			else {
+				break;
+			}
+		}
+		history.erase(history.begin() + historyCounter, history.end());
+	}
 }
 
 void NodeGraphProcessor::EnableEvaluation() {

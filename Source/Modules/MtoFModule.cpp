@@ -57,14 +57,11 @@ double MtoFModule::GetResult(int midiNote, float velocity, int outputID, int voi
 	return outputs[outputID];
 }
 
-void MtoFModule::GetResultIteratively(int voiceID) {
-	if (canBeEvaluated) {
+void MtoFModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
 		if (inputs[0].connectedModule >= 0) {
 			outputs[0] = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
 			outputs[0] = 440.0 * pow(2.0, ((float)outputs[0] - 69) / 12);
 		}
 		else
 			outputs[0] = 69;
-		canBeEvaluated = false;
-	}
 }

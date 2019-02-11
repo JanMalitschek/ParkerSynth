@@ -148,3 +148,13 @@ double RangeModule::GetResult(int midiNote, float velocity, int outputID, int vo
 	}
 	return outputs[outputID];
 }
+
+void RangeModule::GetResultIteratively(int midiNote, float velocity, int voiveID) {
+	double lerpAmount = 0.0f;
+	if (controls[0].connectedModule == -1)
+		lerpAmount = lerpAmountKnob.getValue();
+	else
+		lerpAmount = ngp->modules[controls[0].connectedModule]->outputs[controls[0].connectedOutput];
+
+	outputs[0] = valueA + (valueB - valueA) * lerpAmount;
+}

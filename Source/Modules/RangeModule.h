@@ -23,6 +23,7 @@ public:
 	void SetParameter(int id, float value) override;
 
 	double GetResult(int midiNote, float velocity, int outputID, int voiveID) override;
+	inline void GetResultIteratively(int midiNote, float velocity, int voiveID) override;
 
 private:
 	LaF_TextEditor laF_TextEditor;

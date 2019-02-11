@@ -42,10 +42,10 @@ public:
 	}
 
 	void renderNextBlock(AudioBuffer<float> &outputBuffer, int sampleStart, int numSamples) {
+		/*auto now1 = std::chrono::high_resolution_clock::now();*/
 		for (int sample = 0; sample < numSamples; ++sample) {
 			double result = 0.0;
 			if (currentVelocity > 0.0 || volume > 0.0) {
-				ngp->EnableEvaluation();
 				result = ngp->GetResult(currentMidiNote, currentVelocity, this->id);
 				if (abs(result) > volume) {
 					volume = abs(result);
@@ -55,12 +55,11 @@ public:
 			volume = jmax(volume, 0.0);
 			outputBuffer.addSample(0, sample, result);
 			outputBuffer.addSample(1, sample, result);
-			++sampleStart;
+			//++sampleStart;
 		}
-		/*auto now1 = std::chrono::system_clock::now();
-		auto now2 = std::chrono::system_clock::now();
-		auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(now2 - now1);
-		DBG(time.count());*/
+		//auto now2 = std::chrono::high_resolution_clock::now();
+		//auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(now2 - now1);
+		//DBG(sampleStart);
 		/*lastTime = now;*/
 	}
 	NodeGraphProcessor* ngp;

@@ -124,3 +124,27 @@ double AMRMModule::GetResult(int midiNote, float velocity, int outputID, int voi
 	}
 	return outputs[outputID];
 }
+
+void AMRMModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
+	double carrSignal = 0.0;
+	double modSignal = 0.0;
+	if (inputs[0].connectedModule >= 0)
+		carrSignal = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
+	if (inputs[1].connectedModule >= 0)
+		modSignal = ngp->modules[inputs[1].connectedModule]->outputs[inputs[1].connectedOutput];
+
+	double modFactor = 0.0;
+	if (controls[0].connectedModule >= 0) {
+		modFactor = ngp->modules[controls[0].connectedModule]->outputs[controls[0].connectedOutput];
+	}
+	else {
+		modFactor = amountKnob.getValue();
+	}
+
+	if (modeSlider.getValue() == 0.0) {
+		outputs[0] = carrSignal + (carrSignal * abs(modSignal) - carrSignal) * modFactor;
+	}
+	else {
+		outputs[0] = carrSignal + (carrSignal * modSignal - carrSignal) * modFactor;
+	}
+}

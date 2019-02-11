@@ -107,7 +107,7 @@ public:
 	float sampleRate = 44100.0f;
 	virtual double GetResult(int midiNote, float velocity, int outputID, int voiceID) = 0;
 	virtual void GetResultIteratively(int voiceID);
-	virtual void GetResultIteratively(int midiNote, float velocity, int voiceID);
+	virtual inline void GetResultIteratively(int midiNote, float velocity, int voiceID) = 0;
 
 	bool canBeEvaluated;
 

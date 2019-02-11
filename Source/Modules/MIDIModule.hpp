@@ -20,7 +20,7 @@ public:
 
 	double GetResult(int midiNote, float velocity, int outputID, int voiceID) override;
 
-	void GetResultIteratively(int midiNote, float velocity, int voiceID);
+	inline void GetResultIteratively(int midiNote, float velocity, int voiceID) override;
 private:
 	LinearSmoothedValue<float> velocity;
 };

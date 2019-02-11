@@ -3,13 +3,16 @@
 #include "..\NodeGraphEditor.h"
 #include "..\NodeGraphProcessor.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 FilterModule::FilterModule() : Module(ModuleColorScheme::Grey, "Filter", 1, 1, 1, Point<int>(8, 5), 4) {
 	cutoffKnob.setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
 	cutoffKnob.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
 	cutoffKnob.addListener(this);
 	cutoffKnob.setRotaryParameters(-2.35619f, 2.35619f, true);
-	cutoffKnob.setRange(20.0f, 20000.0f);
-	cutoffKnob.setValue(440.0f);
+	cutoffKnob.setRange(0.01f, 0.5f);
+	cutoffKnob.setValue(0.01f);
 	cutoffKnob.setLookAndFeel(&laF_Knob);
 	addAndMakeVisible(cutoffKnob);
 	
@@ -170,9 +173,9 @@ double FilterModule::GetResult(int midiNote, float velocity, int outputID, int v
 			double newValue = filterTypeSlider.getValue();
 			double norm;
 			double V = pow(10, fabs(gainKnob.getValue()) / 20.0);
-			double K = tan(MathConstants<double>::pi * cutoffKnob.getValue());
+			double K = tan(M_PI * cutoffKnob.getValue());
 			double Q = qKnob.getValue();
-			if (newValue < 1.0) { // LowPass
+			if (newValue <= 1.0) { // LowPass
 				norm = 1 / (1 + K / Q + K * K);
 				voices[voiceID].a0 = K * K * norm;
 				voices[voiceID].a1 = 2 * voices[voiceID].a0;
@@ -180,7 +183,7 @@ double FilterModule::GetResult(int midiNote, float velocity, int outputID, int v
 				voices[voiceID].b1 = 2 * (K * K - 1) * norm;
 				voices[voiceID].b2 = (1 - K / Q + K * K) * norm;
 			}
-			else if (newValue < 2.0) { // BandPass
+			else if (newValue <= 2.0) { // BandPass
 				norm = 1 / (1 + K / Q + K * K);
 				voices[voiceID].a0 = K / Q * norm;
 				voices[voiceID].a1 = 0;
@@ -188,7 +191,7 @@ double FilterModule::GetResult(int midiNote, float velocity, int outputID, int v
 				voices[voiceID].b1 = 2 * (K * K - 1) * norm;
 				voices[voiceID].b2 = (1 - K / Q + K * K) * norm;
 			}
-			else if (newValue >= 2.0) { // HighPass
+			else if (newValue > 2.0) { // HighPass
 				norm = 1 / (1 + K / Q + K * K);
 				voices[voiceID].a0 = 1 * norm;
 				voices[voiceID].a1 = -2 * voices[voiceID].a0;
@@ -196,16 +199,61 @@ double FilterModule::GetResult(int midiNote, float velocity, int outputID, int v
 				voices[voiceID].b1 = 2 * (K * K - 1) * norm;
 				voices[voiceID].b2 = (1 - K / Q + K * K) * norm;
 			}
+			voices[voiceID].z1 = voices[voiceID].z2 = 0.0;
 			voices[voiceID].mustBeRecalculated = false;
 		}
 
 		double input = 0.0;
 		if (inputs[0].connectedModule >= 0)
 			input = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
-		outputs[0] = input * voices[voiceID].a0 * voices[voiceID].z1;
+		outputs[0] = input * voices[voiceID].a0 + voices[voiceID].z1;
 		voices[voiceID].z1 = input * voices[voiceID].a1 + voices[voiceID].z2 - voices[voiceID].b1 * outputs[0];
 		voices[voiceID].z2 = input * voices[voiceID].a2 - voices[voiceID].b2 * outputs[0];
 		canBeEvaluated = false;
 	}
 	return outputs[outputID];
+}
+
+void FilterModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
+	//Recalculate Voice
+	if (voices[voiceID].mustBeRecalculated) {
+		double newValue = filterTypeSlider.getValue();
+		double norm;
+		double V = pow(10, fabs(gainKnob.getValue()) / 20.0);
+		double K = tan(M_PI * cutoffKnob.getValue());
+		double Q = qKnob.getValue();
+		if (newValue <= 1.0) { // LowPass
+			norm = 1 / (1 + K / Q + K * K);
+			voices[voiceID].a0 = K * K * norm;
+			voices[voiceID].a1 = 2 * voices[voiceID].a0;
+			voices[voiceID].a2 = voices[voiceID].a0;
+			voices[voiceID].b1 = 2 * (K * K - 1) * norm;
+			voices[voiceID].b2 = (1 - K / Q + K * K) * norm;
+		}
+		else if (newValue <= 2.0) { // BandPass
+			norm = 1 / (1 + K / Q + K * K);
+			voices[voiceID].a0 = K / Q * norm;
+			voices[voiceID].a1 = 0;
+			voices[voiceID].a2 = -voices[voiceID].a0;
+			voices[voiceID].b1 = 2 * (K * K - 1) * norm;
+			voices[voiceID].b2 = (1 - K / Q + K * K) * norm;
+		}
+		else if (newValue > 2.0) { // HighPass
+			norm = 1 / (1 + K / Q + K * K);
+			voices[voiceID].a0 = 1 * norm;
+			voices[voiceID].a1 = -2 * voices[voiceID].a0;
+			voices[voiceID].a2 = voices[voiceID].a0;
+			voices[voiceID].b1 = 2 * (K * K - 1) * norm;
+			voices[voiceID].b2 = (1 - K / Q + K * K) * norm;
+		}
+		voices[voiceID].z1 = voices[voiceID].z2 = 0.0;
+		voices[voiceID].mustBeRecalculated = false;
+	}
+
+	double input = 0.0;
+	if (inputs[0].connectedModule >= 0)
+		input = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
+	outputs[0] = input * voices[voiceID].a0 + voices[voiceID].z1;
+	voices[voiceID].z1 = input * voices[voiceID].a1 + voices[voiceID].z2 - voices[voiceID].b1 * outputs[0];
+	voices[voiceID].z2 = input * voices[voiceID].a2 - voices[voiceID].b2 * outputs[0];
 }

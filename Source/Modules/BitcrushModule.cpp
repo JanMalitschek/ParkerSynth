@@ -144,3 +144,35 @@ double BitcrushModule::GetResult(int midiNote, float velocity, int outputID, int
 	}
 	return outputs[outputID];
 }
+
+void BitcrushModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
+	double input = 0.0;
+	if (inputs[0].connectedModule >= 0) {
+		input = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
+	}
+
+	double downsampleFactor = 0.0;
+	if (controls[0].connectedModule >= 0) {
+		downsampleFactor = ngp->modules[controls[0].connectedModule]->outputs[controls[0].connectedOutput];
+	}
+	else {
+		downsampleFactor = downsampleKnob.getValue();
+	}
+	float maxHeldSamples = sampleRate * downsampleFactor;
+	voices[voiceID].sampleCounter++;
+	if (voices[voiceID].sampleCounter > maxHeldSamples) {
+		voices[voiceID].currentSample = input;
+		voices[voiceID].sampleCounter = 0;
+	}
+
+	double depthReductionFactor = 0.0;
+	if (controls[1].connectedModule >= 0) {
+		depthReductionFactor = ngp->modules[controls[1].connectedModule]->outputs[controls[1].connectedOutput];
+	}
+	else {
+		depthReductionFactor = depthKnob.getValue();
+	}
+	float resolution = (1.0f - depthReductionFactor) * 1024.0f;
+
+	outputs[0] = floor(voices[voiceID].currentSample * resolution) / resolution;
+}

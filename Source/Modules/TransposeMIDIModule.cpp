@@ -86,3 +86,10 @@ double TransposeMIDIModule::GetResult(int midiNote, float velocity, int outputID
 	}
 	return outputs[outputID];
 }
+
+void TransposeMIDIModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
+	if (inputs[0].connectedModule >= 0)
+		outputs[0] = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput] + transKnob.getValue();
+	else
+		outputs[0] = 69;
+}

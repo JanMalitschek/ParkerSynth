@@ -68,3 +68,7 @@ void ValueModule::textEditorReturnKeyPressed(TextEditor &t) {
 double ValueModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
 	return value;
 }
+
+void ValueModule::GetResultIteratively(int midiNote, float velocity, int voiveID) {
+	outputs[0] = value;
+}

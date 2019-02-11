@@ -47,3 +47,7 @@ double OutModule::GetResult(int midiNote, float velocity, int outputID, int voic
 	else
 		return 0.0f;
 }
+
+void OutModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
+
+}

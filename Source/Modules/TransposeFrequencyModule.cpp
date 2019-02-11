@@ -85,3 +85,10 @@ double TransposeFrequencyModule::GetResult(int midiNote, float velocity, int out
 	}
 	return outputs[outputID];
 }
+
+void TransposeFrequencyModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
+	if (inputs[0].connectedModule >= 0)
+		outputs[0] = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput] * pow(1.059463f, transKnob.getValue());
+	else
+		outputs[0] = 440.0f;
+}

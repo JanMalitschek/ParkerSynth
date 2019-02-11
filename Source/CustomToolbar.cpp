@@ -24,6 +24,10 @@ CustomToolbar::CustomToolbar() : Component(){
 	button_SwitchConnections.setLookAndFeel(&laF_ToolbarButton);
 	button_SwitchConnections.addListener(this);
 	addAndMakeVisible(button_SwitchConnections);
+	button_Recompile.setButtonText("Compile");
+	button_Recompile.setLookAndFeel(&laF_ToolbarButton);
+	button_Recompile.addListener(this);
+	addAndMakeVisible(button_Recompile);
 	dbg = Colour(0, 0, 0);
 	presetTabActive = false;
 	moduleTabActive = false;
@@ -182,6 +186,7 @@ void CustomToolbar::resized() {
 	button_Macro.setBounds(200, 0, 100, 25);
 	button_Info.setBounds(600, 0, 100, 25);
 	button_SwitchConnections.setBounds(700, 0, 100, 25);
+	button_Recompile.setBounds(500, 0, 100, 25);
 
 	button_preset_Save.setBounds(0, 25, 100, 25);
 
@@ -292,6 +297,9 @@ void CustomToolbar::buttonClicked(Button* button) {
 	}
 	else if (button == &button_SwitchConnections) {
 		nge->SwitchConnections();
+	}
+	else if (button == &button_Recompile) {
+		nge->ngp->RecompileNodeTree();
 	}
 	else if (button == &button_module_Gain) {
 		moduleTabActive = false;

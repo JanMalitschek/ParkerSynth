@@ -270,8 +270,7 @@ void NodeGraphEditor::mouseUp(const MouseEvent &event) {
 }
 
 void NodeGraphEditor::mouseDown(const MouseEvent &event) {
-	/*splashScreen.setVisible(false);
-	splashScreen.setEnabled(false);*/
+
 }
 
 void NodeGraphEditor::AddGainModule() {

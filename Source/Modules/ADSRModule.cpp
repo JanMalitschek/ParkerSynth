@@ -216,8 +216,7 @@ double ADSRModule::GetResult(int midiNote, float velocity, int outputID, int voi
 	return outputs[outputID];
 }
 
-void ADSRModule::GetResultIteratively(int voiceID) {
-	if (canBeEvaluated) {
+void ADSRModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
 		if (inputs[0].connectedModule >= 0) {
 			float gain = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
 			double result = 0.0;
@@ -251,6 +250,4 @@ void ADSRModule::GetResultIteratively(int voiceID) {
 		}
 		else
 			outputs[0] = 0.0;
-		canBeEvaluated = false;
-	}
 }

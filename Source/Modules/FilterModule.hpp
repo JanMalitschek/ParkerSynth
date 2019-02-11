@@ -8,7 +8,8 @@ struct BiquadVoice {
 	double z1, z2;
 	bool mustBeRecalculated;
 	BiquadVoice() {
-		a0 = a1 = a2 = b1 = b2 = 0.0;
+		a0 = 1.0;
+		a1 = a2 = b1 = b2 = 0.0;
 		z1 = z2 = 0.0;
 		mustBeRecalculated = true;
 	}
@@ -30,6 +31,7 @@ public:
 	void SetParameter(int id, float value) override;
 
 	double GetResult(int midiNote, float velocity, int outputID, int voiceID) override;
+	inline void GetResultIteratively(int midiNote, float velocity, int voiceID) override;
 private:
 	Slider cutoffKnob;
 	Slider gainKnob;

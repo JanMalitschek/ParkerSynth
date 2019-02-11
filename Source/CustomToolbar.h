@@ -28,6 +28,7 @@ private:
 	TextButton button_Macro;
 	bool macroTabActive;
 	TextButton button_SwitchConnections;
+	TextButton button_Recompile;
 	LaF_ToolbarButton laF_ToolbarButton;
 	Colour dbg;
 	

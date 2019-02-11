@@ -214,8 +214,7 @@ double BasicGeneratorModule::GetResult(int midiNote, float velocity, int outputI
 	return outputs[outputID];
 }
 
-void BasicGeneratorModule::GetResultIteratively(int voiceID) {
-	if (canBeEvaluated) {
+void BasicGeneratorModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
 		float freq = 0.0f;
 		if (inputs[1].connectedModule >= 0)
 			freq = ngp->modules[inputs[1].connectedModule]->outputs[inputs[1].connectedOutput];
@@ -277,7 +276,4 @@ void BasicGeneratorModule::GetResultIteratively(int voiceID) {
 		}
 		else
 			outputs[0] = 0.0;
-
-		canBeEvaluated = false;
-	}
 }

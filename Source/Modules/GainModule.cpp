@@ -81,3 +81,10 @@ double GainModule::GetResult(int midiNote, float velocity, int outputID, int voi
 	}
 	return outputs[outputID];
 }
+
+void GainModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
+	if (inputs[0].connectedModule >= 0)
+		outputs[0] = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput] * gainKnob.getValue();
+	else
+		outputs[0] = 0.0;
+}

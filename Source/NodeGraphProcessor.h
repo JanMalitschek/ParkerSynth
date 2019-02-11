@@ -41,6 +41,7 @@ public:
 	//Recursive evaluation
 	double GetResult(int midiNote, float velocity, int voiceID);
 	//Iterative evaluation
+	void RecompileNodeTree();
 	double GetResultIteratively(int midiNote, float velocity, int voiceID);
 	std::vector<std::pair<unsigned int, unsigned int>> branches;
 	std::vector<unsigned int> history;
@@ -53,7 +54,7 @@ public:
 	int saveDataSize;
 
 private:
-	
+	std::vector<int> evaluationList;
 };
 
 #endif
