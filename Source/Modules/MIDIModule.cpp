@@ -3,6 +3,7 @@
 
 MIDIModule::MIDIModule() : Module(ModuleColorScheme::Pink, "MIDI", 0, 2, 0, Point<int>(4, 4), 0) {
 	velocity.reset(44100, 0.01);
+
 	outputSocketButtons[0]->button.setTooltip("Velocity");
 	outputSocketButtons[0]->SetValueType(ValueType::Velocity);
 	outputSocketButtons[1]->button.setTooltip("MIDI Note Number");

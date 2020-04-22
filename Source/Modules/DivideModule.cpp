@@ -4,6 +4,7 @@
 #include "..\NodeGraphProcessor.h"
 
 DivideModule::DivideModule() : Module(ModuleColorScheme::Grey, "Div", 2, 1, 0, Point<int>(4, 4), 0) {
+
 	inputSocketButtons[0]->button.setTooltip("Value A");
 	inputSocketButtons[0]->SetValueType(ValueType::SimpleValue);
 	inputSocketButtons[1]->button.setTooltip("Value B");
@@ -50,12 +51,8 @@ double DivideModule::GetResult(int midiNote, float velocity, int outputID, int v
 }
 
 void DivideModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
-	double a = 0.0f;
-	double b = 0.0f;
-	if (inputs[0].connectedModule >= 0)
-		a = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
-	if (inputs[1].connectedModule >= 0)
-		b = ngp->modules[inputs[1].connectedModule]->outputs[inputs[1].connectedOutput];
+	READ_INPUT(a, 0)
+	READ_INPUT(b, 1)
 
 	if (b != 0.0)
 		outputs[0] = a / b;

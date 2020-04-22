@@ -1,0 +1,129 @@
+[LofiSupersaw]
+6
+[MIDI]{
+ID:
+0
+Position:
+0
+0
+Num Outputs:
+8
+Connected Outputs:
+0
+Connected Outputs to Controls:
+0
+Parameters:
+0
+}
+[Generator]{
+ID:
+1
+Position:
+350
+0
+Num Outputs:
+4
+Connected Outputs:
+2
+2
+0
+3
+0
+Connected Outputs to Controls:
+1
+-1
+-1
+Parameters:
+3
+2.000000
+5.000000
+0.080000
+}
+[ADSR]{
+ID:
+2
+Position:
+100
+0
+Num Outputs:
+4
+Connected Outputs:
+1
+0
+0
+Connected Outputs to Controls:
+0
+Parameters:
+4
+0.500000
+0.500000
+0.500000
+0.440000
+}
+[MtoF]{
+ID:
+3
+Position:
+100
+100
+Num Outputs:
+4
+Connected Outputs:
+1
+0
+1
+Connected Outputs to Controls:
+0
+Parameters:
+0
+}
+[Out]{
+ID:
+4
+Position:
+700
+25
+Num Outputs:
+0
+Connected Outputs:
+1
+5
+0
+Connected Outputs to Controls:
+0
+Parameters:
+0
+}
+[Filter]{
+ID:
+5
+Position:
+500
+0
+Num Outputs:
+3
+Connected Outputs:
+1
+1
+0
+Connected Outputs to Controls:
+1
+-1
+-1
+Parameters:
+4
+0.029600
+-0.320000
+2.317600
+0.000000
+}
+Macros{
+1
+0
+5
+0
+0.040000
+0.010000
+0.490000
+Filter->Cutoff
+}

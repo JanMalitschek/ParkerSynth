@@ -39,10 +39,13 @@ public:
 	inline void GetResultIteratively(int midiNote, float velocity, int voiceID) override;
 private:
 	Slider shapeKnob;
+	double shape;
 	LaF_RotarySlider laF_Knob;
 	LaF_VerticalSlider laF_Slider;
 	Slider voicesKnob;
+	double voicesParam;
 	Slider detuneKnob;
+	double detune;
 	float oldDetune;
 
 	BasicGeneratorVoice voices[9];

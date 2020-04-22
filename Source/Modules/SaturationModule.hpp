@@ -22,6 +22,8 @@ public:
 	inline void GetResultIteratively(int midiNote, float velocity, int voiceID) override;
 private:
 	Slider slopeKnob;
+	double slope;
 	Slider kneeKnob;
+	double knee;
 	LaF_RotarySlider laF_Knob;
 };

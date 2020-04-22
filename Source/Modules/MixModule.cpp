@@ -10,6 +10,7 @@ MixModule::MixModule() : Module(ModuleColorScheme::Grey, "Mix", 2, 1, 1, Point<i
 	mixKnob.setRotaryParameters(-2.35619f, 2.35619f, true);
 	mixKnob.setRange(0.0f, 1.0f, 0.0f);
 	mixKnob.setValue(0.0f);
+	mix = 0.0f;
 	mixKnob.setLookAndFeel(&laF_Knob);
 	mixKnob.setTooltip("Mix\nSignal A - Signal B");
 	addAndMakeVisible(mixKnob);
@@ -29,7 +30,7 @@ void MixModule::PaintGUI(Graphics &g) {
 }
 
 void MixModule::ResizeGUI() {
-	mixKnob.setBounds(25, 25, 50, 50);
+	mixKnob.setBounds(UtPX(1), UtPY(1), UtPX(2), UtPY(2));
 }
 
 void MixModule::sliderValueChanged(Slider* slider) {
@@ -41,6 +42,7 @@ void MixModule::sliderValueChanged(Slider* slider) {
 		ngp->lastTweakedParameterMax = mixKnob.getMaximum();
 		ngp->lastTweakedParameterInc = mixKnob.getInterval();
 		ngp->lastTweakedParameterValue = mixKnob.getValue();
+		mix = mixKnob.getValue();
 	}
 }
 
@@ -77,7 +79,7 @@ void MixModule::SetParameter(int id, float value) {
 
 double MixModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
 	if (canBeEvaluated) {
-		float mixFactor = mixKnob.getValue();
+		float mixFactor = mix;
 		if (controls[0].connectedModule >= 0)
 			mixFactor = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID);
 		double signalA = 0.0f;
@@ -94,15 +96,9 @@ double MixModule::GetResult(int midiNote, float velocity, int outputID, int voic
 }
 
 void MixModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
-	float mixFactor = mixKnob.getValue();
-	if (controls[0].connectedModule >= 0)
-		mixFactor = ngp->modules[controls[0].connectedModule]->outputs[controls[0].connectedOutput];
-	double signalA = 0.0f;
-	double signalB = 0.0f;
-	if (inputs[0].connectedModule >= 0)
-		signalA = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
-	if (inputs[1].connectedModule >= 0)
-		signalB = ngp->modules[inputs[1].connectedModule]->outputs[inputs[1].connectedOutput];
+	READ_CTRL(mixFactor, 0, mixKnob.getValue())
+	READ_INPUT(signalA, 0)
+	READ_INPUT(signalB, 1)
 
 	outputs[0] = signalA + (signalB - signalA) * mixFactor;
 }

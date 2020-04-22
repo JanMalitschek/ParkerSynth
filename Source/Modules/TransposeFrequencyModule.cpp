@@ -10,6 +10,7 @@ TransposeFrequencyModule::TransposeFrequencyModule() : Module(ModuleColorScheme:
 	transKnob.setRotaryParameters(-2.35619f, 2.35619f, true);
 	transKnob.setRange(-12.0f, 12.0f, 1.0f);
 	transKnob.setValue(0.0f);
+	trans = 0.0f;
 	transKnob.setLookAndFeel(&laF_Knob);
 	transKnob.setTooltip("Transposition\n-12.0st - 12.0st");
 	addAndMakeVisible(transKnob);
@@ -30,7 +31,7 @@ void TransposeFrequencyModule::PaintGUI(Graphics &g) {
 }
 
 void TransposeFrequencyModule::ResizeGUI() {
-	transKnob.setBounds(25, 25, 50, 50);
+	transKnob.setBounds(UtPX(1), UtPY(1), UtPX(2), UtPY(2));
 }
 
 void TransposeFrequencyModule::sliderValueChanged(Slider* slider) {
@@ -42,6 +43,7 @@ void TransposeFrequencyModule::sliderValueChanged(Slider* slider) {
 		ngp->lastTweakedParameterMax = transKnob.getMaximum();
 		ngp->lastTweakedParameterInc = transKnob.getInterval();
 		ngp->lastTweakedParameterValue = transKnob.getValue();
+		trans = transKnob.getValue();
 	}
 }
 
@@ -79,7 +81,7 @@ void TransposeFrequencyModule::SetParameter(int id, float value) {
 double TransposeFrequencyModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
 	if (canBeEvaluated) {
 		if (inputs[0].connectedModule >= 0)
-			outputs[0] = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID) * pow(1.059463f, transKnob.getValue());
+			outputs[0] = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID) * pow(1.059463f, trans);
 		else
 			outputs[0] = 440.0f;
 		canBeEvaluated = false;
@@ -88,8 +90,8 @@ double TransposeFrequencyModule::GetResult(int midiNote, float velocity, int out
 }
 
 void TransposeFrequencyModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
-	if (inputs[0].connectedModule >= 0)
-		outputs[0] = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput] * pow(1.059463f, transKnob.getValue());
+	if (IS_INPUT_CONNECTED(0))
+		outputs[0] = GET_INPUT(0) * pow(1.059463f, transKnob.getValue());
 	else
 		outputs[0] = 440.0f;
 }

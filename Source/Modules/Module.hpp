@@ -6,14 +6,6 @@
 #include "../LookAndFeel/Colors.hpp"
 
 /*
-PLANNED MODULES:
-Biquad Filter
-Inputs:
-Signal
-Outputs:
-Signal
-Controls:
-Frequency
 
 */
 
@@ -68,6 +60,19 @@ enum ModuleType {
 	Filter
 };
 
+#define IS_INPUT_CONNECTED(in) inputs[in].connectedModule >= 0
+#define READ_INPUT(val, in) double val = 0.0;\
+							if (inputs[in].connectedModule >= 0) val = ngp->modules[inputs[in].connectedModule]->outputs[inputs[in].connectedOutput];
+#define READ_INPUT_FLBK(val, in, flbk) double val = flbk;\
+										if (inputs[in].connectedModule >= 0) val = ngp->modules[inputs[in].connectedModule]->outputs[inputs[in].connectedOutput];
+#define GET_INPUT(in) ngp->modules[inputs[in].connectedModule]->outputs[inputs[in].connectedOutput]
+
+#define IS_CTRL_CONNECTED(ctrl) controls[ctrl].connectedModule >= 0
+#define READ_CTRL(val, ctrl, flbk) double val = flbk;\
+							if (controls[ctrl].connectedModule >= 0) val = ngp->modules[controls[ctrl].connectedModule]->outputs[controls[ctrl].connectedOutput];
+#define GET_CTRL(ctrl) ngp->modules[controls[ctrl].connectedModule]->outputs[controls[ctrl].connectedOutput]
+#define READ_KNOB(val, knob) double val = knob.getValue();
+
 class NodeGraphEditor;
 class NodeGraphProcessor;
 
@@ -113,8 +118,8 @@ public:
 
 	int branchID;
 
-	inline int UtPX(int unit);
-	inline int UtPY(int unit);
+	int UtPX(int unit);
+	int UtPY(int unit);
 
 private:
 	void DrawBackgroundHighlight(Graphics &g, Rectangle<int> bounds);

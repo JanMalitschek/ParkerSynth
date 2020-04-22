@@ -10,18 +10,15 @@ NodeGraphEditor::NodeGraphEditor() : Component()
 	currentModuleSize = Point<int>(4, 4);
 	currentModuleType = ModuleType::Gain;
 	currentMoveModuleID = -1;
-	moduleOffset = Point<int>(0, 0);
-	oldModuleOffset = Point<int>(0, 0);
 
 	canPlaceNode = true;
 
 	tooltips.setLookAndFeel(&laF_ToolbarButton);
 	addAndMakeVisible(tooltips);
 
-	/*splashScreen.addMouseListener(this, false);
-	addAndMakeVisible(splashScreen);*/
-
 	connectionsAbove = false;
+
+	scale = 1.0f;
 
 	setSize(800, 575);
 }
@@ -106,6 +103,24 @@ void NodeGraphEditor::DrawConnections(Graphics &g) {
 	}
 }
 
+void NodeGraphEditor::CalculatePatchBounds()
+{
+	for (int i = 0; i < ngp->modules.size(); i++) {
+		//Left
+		if (ngp->modules[i]->getBounds().getTopLeft().x < this->patchBounds.getTopLeft().x)
+			this->patchBounds.setLeft(ngp->modules[i]->getBounds().getTopLeft().x);
+		//Right
+		if (ngp->modules[i]->getBounds().getTopRight().x > this->patchBounds.getTopRight().x)
+			this->patchBounds.setRight(ngp->modules[i]->getBounds().getTopRight().x);
+		//Top
+		if (ngp->modules[i]->getBounds().getTopLeft().y < this->patchBounds.getTopLeft().y)
+			this->patchBounds.setTop(ngp->modules[i]->getBounds().getTopLeft().y);
+		//Bottom
+		if (ngp->modules[i]->getBounds().getBottomRight().y > this->patchBounds.getBottomRight().y)
+			this->patchBounds.setBottom(ngp->modules[i]->getBounds().getBottomRight().y);
+	}
+}
+
 void NodeGraphEditor::DrawBezierCurve(Graphics &g, Point<float> start, Point<float> control0, Point<float> control1, Point<float> end) {
 	Path curve;
 	for (float t = 0.0f; t <= 1.1f; t += 0.1f) {
@@ -129,7 +144,7 @@ void NodeGraphEditor::RedrawGUI() {
 	for (int i = 0; i < ngp->modules.size(); i++) {
 		if (ngp->modules[i] != nullptr) {
 			addAndMakeVisible(ngp->modules[i]);
-			ngp->modules[i]->setBounds(Rectangle<int>(ngp->modules[i]->getBounds().getTopLeft() + moduleOffset, ngp->modules[i]->getBounds().getBottomRight() + moduleOffset));
+			ngp->modules[i]->setBounds(Rectangle<int>(ngp->modules[i]->getBounds().getTopLeft(), ngp->modules[i]->getBounds().getBottomRight()));
 			ngp->modules[i]->nge = this;
 		}
 	}
@@ -141,26 +156,39 @@ void NodeGraphEditor::resized() {
 }
 
 void NodeGraphEditor::mouseDrag(const MouseEvent &event) {
-	/*if (mode == Mode::Idle && event.mods.isLeftButtonDown()) {
+	if (mode == Mode::Idle && event.mods.isLeftButtonDown()) {
 		rawMousePos = event.getPosition();
 		mousePos.x = (int)(floor(rawMousePos.x * 0.04f) / 0.04f);
 		mousePos.y = (int)(floor(rawMousePos.y * 0.04f) / 0.04f);
-		if (mousePos != lastMousePos) {
-			mouseOffset = mousePos - lastMousePos;
-			lastMousePos = mousePos;
-			moduleOffset += mouseOffset;
-			moduleOffset.setX(jmax(jmin(moduleOffset.getX(), 100), 0));
-			moduleOffset.setY(jmax(jmin(moduleOffset.getY(), 100), 0));
-		}
+
+		mouseOffset = mousePos - lastMousePos;
+		if (mouseOffset.x < 0 && patchBounds.getBottomRight().x < 200)
+			mouseOffset.x = 0;  
+		else if (mouseOffset.x > 0 && patchBounds.getTopLeft().x > getWidth() - 200)
+			mouseOffset.x = 0;
+		if (mouseOffset.y < 0 && patchBounds.getBottomRight().y < 200)
+			mouseOffset.y = 0;
+		else if (mouseOffset.y > 0 && patchBounds.getTopLeft().y > getHeight() - 200)
+			mouseOffset.y = 0;
+		lastMousePos = mousePos;
+		/*moduleOffset.setX(jmax(jmin(moduleOffset.getX(), 400), 0));
+		moduleOffset.setY(jmax(jmin(moduleOffset.getY(), 400), 0));*/
 		setMouseCursor(MouseCursor::DraggingHandCursor);
-	}
-	if (oldModuleOffset != moduleOffset) {
+		this->patchBounds.setPosition(this->patchBounds.getTopLeft() + mouseOffset);
 		for (int i = 0; i < ngp->modules.size(); i++) {
-			ngp->modules[i]->setBounds(Rectangle<int>(ngp->modules[i]->getBounds().getTopLeft() + moduleOffset, ngp->modules[i]->getBounds().getBottomRight() + moduleOffset));
+			ngp->modules[i]->setTopLeftPosition(ngp->modules[i]->getBounds().getTopLeft() + mouseOffset);
 		}
 		repaint(0, 0, 800, 575);
-		oldModuleOffset = moduleOffset;
-	}*/
+	}
+}
+
+void NodeGraphEditor::mouseWheelMove(const MouseEvent &event, const MouseWheelDetails &wheel) {
+	/*this->scale += wheel.deltaY;
+	this->scale = jlimit<float>(0.5f, 2.0f, this->scale);
+	for (int i = 0; i < ngp->modules.size(); i++) {
+		ngp->modules[i]->setBounds(Rectangle<int>(ngp->modules[i]->getBounds().getTopLeft(), ngp->modules[i]->getBounds().getBottomRight()));
+	}
+	repaint(0, 0, 800, 575);*/
 }
 
 void NodeGraphEditor::mouseMove(const MouseEvent &event) {
@@ -258,6 +286,7 @@ void NodeGraphEditor::mouseUp(const MouseEvent &event) {
 		mode = Mode::Idle;
 		ngp->currentID++;
 		ngp->canProcess = true;
+		this->CalculatePatchBounds();
 	}
 	if (mode == Mode::MoveNode && event.mods.isLeftButtonDown()) {
 		if (canPlaceNode) {
@@ -265,6 +294,7 @@ void NodeGraphEditor::mouseUp(const MouseEvent &event) {
 			mode = Mode::Idle;
 			currentMoveModuleID = -1;
 			repaint(0, 0, 800, 575);
+			this->CalculatePatchBounds();
 		}
 	}
 }
@@ -524,6 +554,7 @@ void NodeGraphEditor::DeleteModule(int moduleID) {
 			ngp->outputModuleID -= 1;
 		ngp->currentID -= 1;
 		repaint(0, 0, 800, 575);
+		this->CalculatePatchBounds();
 	}
 }
 

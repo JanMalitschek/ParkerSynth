@@ -23,4 +23,5 @@ public:
 	inline void GetResultIteratively(int midiNote, float velocity, int voiceID) override;
 private:
 	LinearSmoothedValue<float> velocity;
+
 };

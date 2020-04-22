@@ -61,6 +61,10 @@ class LaF_ControlSocket : public LookAndFeel_V4 {
 
 };
 
+class LaF_NewToolbarButton : public LookAndFeel_V4 {
+
+};
+
 class LaF_RotarySlider : public LookAndFeel_V4 {
 	void drawRotarySlider(Graphics &g, int x, int y, int width, int height, float sliderPos, float rotaryStartAngle, float rotaryEndAngle, Slider &slider) override {
 		float diameter = jmin(width, height) * 0.8f;

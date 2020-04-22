@@ -10,6 +10,7 @@ AMRMModule::AMRMModule() : Module(ModuleColorScheme::Grey, "AM RM", 2, 1, 1, Poi
 	amountKnob.setRotaryParameters(-2.35619f, 2.35619f, true);
 	amountKnob.setRange(0.0f, 1.0f);
 	amountKnob.setValue(0.0f);
+	amount = 0.0f;
 	amountKnob.setLookAndFeel(&laF_Knob);
 	amountKnob.setTooltip("Amount\n0.0 - 1.0");
 	addAndMakeVisible(amountKnob);
@@ -19,6 +20,7 @@ AMRMModule::AMRMModule() : Module(ModuleColorScheme::Grey, "AM RM", 2, 1, 1, Poi
 	modeSlider.addListener(this);
 	modeSlider.setRange(0.0f, 1.0f, 1.0f);
 	modeSlider.setValue(0.0f);
+	mode = 0.0f;
 	modeSlider.setLookAndFeel(&laF_Slider);
 	modeSlider.setTooltip("Mode\nAM - RM");
 	addAndMakeVisible(modeSlider);
@@ -41,8 +43,8 @@ void AMRMModule::PaintGUI(Graphics &g) {
 }
 
 void AMRMModule::ResizeGUI() {
-	amountKnob.setBounds(25, 50, 50, 50);
-	modeSlider.setBounds(25, 25, 50, 25);
+	amountKnob.setBounds(UtPX(1), UtPY(2), UtPX(2), UtPY(2));
+	modeSlider.setBounds(UtPX(1), UtPY(1), UtPX(2), UtPY(1));
 }
 
 void AMRMModule::sliderValueChanged(Slider* slider) {
@@ -54,6 +56,10 @@ void AMRMModule::sliderValueChanged(Slider* slider) {
 		ngp->lastTweakedParameterMax = amountKnob.getMaximum();
 		ngp->lastTweakedParameterInc = amountKnob.getInterval();
 		ngp->lastTweakedParameterValue = amountKnob.getValue();
+		amount = amountKnob.getValue();
+	}
+	else if (slider == &modeSlider) {
+		mode = modeSlider.getValue();
 	}
 }
 
@@ -113,10 +119,10 @@ double AMRMModule::GetResult(int midiNote, float velocity, int outputID, int voi
 			modFactor = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID);
 		}
 		else {
-			modFactor = amountKnob.getValue();
+			modFactor = amount;
 		}
 
-		if (modeSlider.getValue() == 0.0) {
+		if (mode == 0.0) {
 			outputs[0] = carrSignal + (carrSignal * abs(modSignal) - carrSignal) * modFactor;
 		}
 		else {
@@ -128,22 +134,12 @@ double AMRMModule::GetResult(int midiNote, float velocity, int outputID, int voi
 }
 
 void AMRMModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
-	double carrSignal = 0.0;
-	double modSignal = 0.0;
-	if (inputs[0].connectedModule >= 0)
-		carrSignal = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
-	if (inputs[1].connectedModule >= 0)
-		modSignal = ngp->modules[inputs[1].connectedModule]->outputs[inputs[1].connectedOutput];
+	READ_INPUT(carrSignal, 0)
+	READ_INPUT(modSignal, 1)
 
-	double modFactor = 0.0;
-	if (controls[0].connectedModule >= 0) {
-		modFactor = ngp->modules[controls[0].connectedModule]->outputs[controls[0].connectedOutput];
-	}
-	else {
-		modFactor = amountKnob.getValue();
-	}
+	READ_CTRL(modFactor, 0, amount)
 
-	if (modeSlider.getValue() == 0.0) {
+	if (mode == 0.0) {
 		outputs[0] = carrSignal + (carrSignal * abs(modSignal) - carrSignal) * modFactor;
 	}
 	else {

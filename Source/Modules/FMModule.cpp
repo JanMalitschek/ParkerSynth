@@ -11,9 +11,11 @@ FMModule::FMModule() : Module(ModuleColorScheme::Grey, "FM", 3, 1, 1, Point<int>
 	fmKnob.setRotaryParameters(-2.35619f, 2.35619f, true);
 	fmKnob.setRange(0.0f, 32.0f, 0.01f);
 	fmKnob.setValue(1.0f);
+	fm = 1.0f;
 	fmKnob.setLookAndFeel(&laF_Knob);
 	fmKnob.setTooltip("FM\n0.0 - 32.0");
 	addAndMakeVisible(fmKnob);
+
 	inputSocketButtons[0]->button.setTooltip("Carrier Frequency");
 	inputSocketButtons[0]->SetValueType(ValueType::Frequency);
 	inputSocketButtons[1]->button.setTooltip("Modulator Signal");
@@ -34,7 +36,7 @@ void FMModule::PaintGUI(Graphics &g) {
 }
 
 void FMModule::ResizeGUI() {
-	fmKnob.setBounds(25, 25, 50, 50);
+	fmKnob.setBounds(UtPX(1), UtPY(1), UtPX(2), UtPY(2));
 }
 
 void FMModule::sliderValueChanged(Slider* slider) {
@@ -46,6 +48,7 @@ void FMModule::sliderValueChanged(Slider* slider) {
 		ngp->lastTweakedParameterMax = fmKnob.getMaximum();
 		ngp->lastTweakedParameterInc = fmKnob.getInterval();
 		ngp->lastTweakedParameterValue = fmKnob.getValue();
+		fm = fmKnob.getValue();
 	}
 }
 
@@ -98,11 +101,9 @@ double FMModule::GetResult(int midiNote, float velocity, int outputID, int voice
 		else
 			b = 1.0;
 
-		double amount = 0.0;
+		double amount = fm;
 		if (controls[0].connectedModule >= 0)
-			amount = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID) * fmKnob.getValue();
-		else
-			amount = fmKnob.getValue();
+			amount = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID) * fm;
 
 		outputs[0] = a + b * c * amount;
 		canBeEvaluated = false;
@@ -111,25 +112,13 @@ double FMModule::GetResult(int midiNote, float velocity, int outputID, int voice
 }
 
 void FMModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
-	double a = 0.0; //frequency
-	double b = 0.0; //modulator signal
-	double c = 0.0; //modulator frequency
-	if (inputs[0].connectedModule >= 0)
-		a = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
-	else
-		a = 0.0;
-	if (inputs[1].connectedModule >= 0)
-		b = ngp->modules[inputs[1].connectedModule]->GetResult(midiNote, velocity, inputs[1].connectedOutput, voiceID);
-	else
-		b = 0.0;
-	if (inputs[2].connectedModule >= 0)
-		c = ngp->modules[inputs[2].connectedModule]->GetResult(midiNote, velocity, inputs[2].connectedOutput, voiceID);
-	else
-		b = 1.0;
+	READ_INPUT(a, 0)
+	READ_INPUT(b, 1)
+	READ_INPUT_FLBK(c, 2, 1.0)
 
 	double amount = 0.0;
-	if (controls[0].connectedModule >= 0)
-		amount = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID) * fmKnob.getValue();
+	if (IS_CTRL_CONNECTED(0))
+		amount = GET_CTRL(0) * fmKnob.getValue();
 	else
 		amount = fmKnob.getValue();
 

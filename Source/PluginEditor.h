@@ -40,5 +40,4 @@ private:
 	//CustomToolbar toolbar;
 	NodeGraphEditor nge;
 	CustomToolbar toolbar;
-
 };

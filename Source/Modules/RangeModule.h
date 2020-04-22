@@ -30,6 +30,7 @@ private:
 	LaF_RotarySlider laF_RotarySlider;
 	TextEditor inputFieldA;
 	Slider lerpAmountKnob;
+	double lerp;
 	TextEditor inputFieldB;
 	NumericTextFilter filter;
 	float valueA;

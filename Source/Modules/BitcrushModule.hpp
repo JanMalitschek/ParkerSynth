@@ -27,7 +27,9 @@ public:
 	inline void GetResultIteratively(int midiNote, float velocity, int voiceID) override;
 private:
 	Slider depthKnob;
+	double depth;
 	Slider downsampleKnob;
+	double downsample;
 	LaF_RotarySlider laF_Knob;
 
 	unsigned int sampleRate;

@@ -54,8 +54,8 @@ double WhiteNoiseModule::GetResult(int midiNote, float velocity, int outputID, i
 
 void WhiteNoiseModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
 	float velocityIn = 0.0f;
-	if (inputs[0].connectedModule >= 0)
-		velocityIn = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
+	if (IS_INPUT_CONNECTED(0))
+		velocityIn = GET_INPUT(0);
 	if (velocityIn > 0.0f) {
 		outputs[0] = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * velocityIn;
 	}

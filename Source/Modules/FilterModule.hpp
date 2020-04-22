@@ -34,9 +34,14 @@ public:
 	inline void GetResultIteratively(int midiNote, float velocity, int voiceID) override;
 private:
 	Slider cutoffKnob;
+	double cutoff;
 	Slider gainKnob;
+	double gain;
 	Slider qKnob;
+	double q;
 	Slider filterTypeSlider;
+	double type;
+
 	LaF_RotarySlider laF_Knob;
 	LaF_VerticalSlider laF_Slider;
 

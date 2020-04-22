@@ -312,6 +312,7 @@ void NodeGraphProcessor::LoadPreset(bool fromPresetFile) {
 	canProcess = true;
 	if (this->nge != nullptr) {
 		this->nge->RedrawGUI();
+		this->nge->CalculatePatchBounds();
 	}
 }
 

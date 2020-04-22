@@ -10,6 +10,7 @@ BitcrushModule::BitcrushModule() : Module(ModuleColorScheme::Grey, "Bitcrush", 1
 	depthKnob.setRotaryParameters(-2.35619f, 2.35619f, true);
 	depthKnob.setRange(0.0f, 0.995f);
 	depthKnob.setValue(0.0f);
+	depth = 0.0f;
 	depthKnob.setSkewFactor(2.0f);
 	depthKnob.setLookAndFeel(&laF_Knob);
 	depthKnob.setTooltip("Bit Depth\n100% - 0.005%");
@@ -21,6 +22,7 @@ BitcrushModule::BitcrushModule() : Module(ModuleColorScheme::Grey, "Bitcrush", 1
 	downsampleKnob.setRotaryParameters(-2.35619f, 2.35619f, true);
 	downsampleKnob.setRange(0.0f, 1.0f);
 	downsampleKnob.setValue(0.0f);
+	downsample = 0.0f;
 	downsampleKnob.setSkewFactor(0.1f);
 	downsampleKnob.setLookAndFeel(&laF_Knob);
 	downsampleKnob.setTooltip("Samplerate\n100% - 0.001%");
@@ -50,8 +52,8 @@ void BitcrushModule::PaintGUI(Graphics &g) {
 }
 
 void BitcrushModule::ResizeGUI() {
-	depthKnob.setBounds(25, 25, 50, 50);
-	downsampleKnob.setBounds(75, 25, 50, 50);
+	depthKnob.setBounds(UtPX(1), UtPY(1), UtPX(2), UtPY(2));
+	downsampleKnob.setBounds(UtPX(3), UtPY(1), UtPX(2), UtPY(2));
 }
 
 void BitcrushModule::sliderValueChanged(Slider* slider) {
@@ -63,6 +65,7 @@ void BitcrushModule::sliderValueChanged(Slider* slider) {
 		ngp->lastTweakedParameterMax = depthKnob.getMaximum();
 		ngp->lastTweakedParameterInc = depthKnob.getInterval();
 		ngp->lastTweakedParameterValue = depthKnob.getValue();
+		depth = depthKnob.getValue();
 	}
 	else if (slider == &downsampleKnob) {
 		ngp->lastTweakedModule = this->id;
@@ -72,6 +75,7 @@ void BitcrushModule::sliderValueChanged(Slider* slider) {
 		ngp->lastTweakedParameterMax = downsampleKnob.getMaximum();
 		ngp->lastTweakedParameterInc = downsampleKnob.getInterval();
 		ngp->lastTweakedParameterValue = downsampleKnob.getValue();
+		downsample = downsampleKnob.getValue();
 	}
 }
 
@@ -79,10 +83,16 @@ void BitcrushModule::sliderDragStarted(Slider* slider) {
 	if (slider == &depthKnob) {
 		slider->setMouseCursor(MouseCursor::UpDownResizeCursor);
 	}
+	else if (slider == &downsampleKnob) {
+		slider->setMouseCursor(MouseCursor::UpDownResizeCursor);
+	}
 }
 
 void BitcrushModule::sliderDragEnded(Slider* slider) {
 	if (slider == &depthKnob) {
+		slider->setMouseCursor(MouseCursor::NormalCursor);
+	}
+	else if (slider == &downsampleKnob) {
 		slider->setMouseCursor(MouseCursor::NormalCursor);
 	}
 }
@@ -118,48 +128,37 @@ double BitcrushModule::GetResult(int midiNote, float velocity, int outputID, int
 			input = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
 		}
 
-		double downsampleFactor = 0.0;
+		double downsampleFactor = downsample;
 		if (controls[0].connectedModule >= 0) {
 			downsampleFactor = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID);
 		}
-		else {
-			downsampleFactor = downsampleKnob.getValue();
-		}
+
+		BitcrushVoice& currentVoice = voices[voiceID];
 		float maxHeldSamples = sampleRate * downsampleFactor;
-		voices[voiceID].sampleCounter++;
-		if (voices[voiceID].sampleCounter > maxHeldSamples) {
-			voices[voiceID].currentSample = input;
-			voices[voiceID].sampleCounter = 0;
+		currentVoice.sampleCounter++;
+		if (currentVoice.sampleCounter > maxHeldSamples) {
+			currentVoice.currentSample = input;
+			currentVoice.sampleCounter = 0;
 		}
 
-		double depthReductionFactor = 0.0;
+		double depthReductionFactor = depth;
 		if (controls[1].connectedModule >= 0) {
 			depthReductionFactor = ngp->modules[controls[1].connectedModule]->GetResult(midiNote, velocity, controls[1].connectedOutput, voiceID);
 		}
-		else {
-			depthReductionFactor = depthKnob.getValue();
-		}
+
 		float resolution = (1.0f - depthReductionFactor) * 1024.0f;
 
-		outputs[0] = floor(voices[voiceID].currentSample * resolution) / resolution;
+		outputs[0] = floor(currentVoice.currentSample * resolution) / resolution;
 		canBeEvaluated = false;
 	}
 	return outputs[outputID];
 }
 
 void BitcrushModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
-	double input = 0.0;
-	if (inputs[0].connectedModule >= 0) {
-		input = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
-	}
+	READ_INPUT(input, 0)
 
-	double downsampleFactor = 0.0;
-	if (controls[0].connectedModule >= 0) {
-		downsampleFactor = ngp->modules[controls[0].connectedModule]->outputs[controls[0].connectedOutput];
-	}
-	else {
-		downsampleFactor = downsampleKnob.getValue();
-	}
+	READ_CTRL(downsampleFactor, 0, downsampleKnob.getValue())
+
 	float maxHeldSamples = sampleRate * downsampleFactor;
 	voices[voiceID].sampleCounter++;
 	if (voices[voiceID].sampleCounter > maxHeldSamples) {
@@ -167,13 +166,8 @@ void BitcrushModule::GetResultIteratively(int midiNote, float velocity, int voic
 		voices[voiceID].sampleCounter = 0;
 	}
 
-	double depthReductionFactor = 0.0;
-	if (controls[1].connectedModule >= 0) {
-		depthReductionFactor = ngp->modules[controls[1].connectedModule]->outputs[controls[1].connectedOutput];
-	}
-	else {
-		depthReductionFactor = depthKnob.getValue();
-	}
+	READ_CTRL(depthReductionFactor, 1, depthKnob.getValue())
+
 	float resolution = (1.0f - depthReductionFactor) * 1024.0f;
 
 	outputs[0] = floor(voices[voiceID].currentSample * resolution) / resolution;

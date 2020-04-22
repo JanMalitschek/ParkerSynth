@@ -11,6 +11,7 @@ ADSRModule::ADSRModule() : Module(ModuleColorScheme::Blue, "ADSR", 1, 1, 0, Poin
 	aKnob.setRotaryParameters(-2.35619f, 2.35619f, true);
 	aKnob.setRange(0.0f, 5.0f, 0.01f);
 	aKnob.setValue(0.5f);
+	attack = 0.5f;
 	aKnob.setLookAndFeel(&laF_Knob);
 	aKnob.setTooltip("Attack\n0.0 - 5.0");
 	addAndMakeVisible(aKnob);
@@ -21,6 +22,7 @@ ADSRModule::ADSRModule() : Module(ModuleColorScheme::Blue, "ADSR", 1, 1, 0, Poin
 	dKnob.setRotaryParameters(-2.35619f, 2.35619f, true);
 	dKnob.setRange(0.0f, 5.0f, 0.01f);
 	dKnob.setValue(0.5f);
+	decay = 0.5f;
 	dKnob.setLookAndFeel(&laF_Knob);
 	dKnob.setTooltip("Decay\n0.0 - 5.0");
 	addAndMakeVisible(dKnob);
@@ -31,6 +33,7 @@ ADSRModule::ADSRModule() : Module(ModuleColorScheme::Blue, "ADSR", 1, 1, 0, Poin
 	sKnob.setRotaryParameters(-2.35619f, 2.35619f, true);
 	sKnob.setRange(0.0f, 1.0f, 0.01f);
 	sKnob.setValue(0.5f);
+	sustain = 0.5f;
 	sKnob.setLookAndFeel(&laF_Knob);
 	sKnob.setTooltip("Sustain\n0.0 - 1.0");
 	addAndMakeVisible(sKnob);
@@ -41,6 +44,7 @@ ADSRModule::ADSRModule() : Module(ModuleColorScheme::Blue, "ADSR", 1, 1, 0, Poin
 	rKnob.setRotaryParameters(-2.35619f, 2.35619f, true);
 	rKnob.setRange(0.0f, 5.0f, 0.01f);
 	rKnob.setValue(1.0f);
+	release = 1.0f;
 	rKnob.setLookAndFeel(&laF_Knob);
 	rKnob.setTooltip("Release\n0.0 - 5.0");
 	addAndMakeVisible(rKnob);
@@ -51,6 +55,7 @@ ADSRModule::ADSRModule() : Module(ModuleColorScheme::Blue, "ADSR", 1, 1, 0, Poin
 		voices[i].lastGain = 0.0;
 		voices[i].reset = false;
 	}
+
 	inputSocketButtons[0]->button.setTooltip("Trigger Velocity");
 	inputSocketButtons[0]->SetValueType(ValueType::Velocity);
 	outputSocketButtons[0]->button.setTooltip("Velocity");
@@ -81,6 +86,7 @@ void ADSRModule::sliderValueChanged(Slider* slider) {
 		ngp->lastTweakedParameterMax = aKnob.getMaximum();
 		ngp->lastTweakedParameterInc = aKnob.getInterval();
 		ngp->lastTweakedParameterValue = aKnob.getValue();
+		attack = aKnob.getValue();
 	}
 	else if (slider == &dKnob) {
 		ngp->lastTweakedModule = this->id;
@@ -90,6 +96,7 @@ void ADSRModule::sliderValueChanged(Slider* slider) {
 		ngp->lastTweakedParameterMax = dKnob.getMaximum();
 		ngp->lastTweakedParameterInc = dKnob.getInterval();
 		ngp->lastTweakedParameterValue = dKnob.getValue();
+		decay = dKnob.getValue();
 	}
 	else if (slider == &sKnob) {
 		ngp->lastTweakedModule = this->id;
@@ -99,6 +106,8 @@ void ADSRModule::sliderValueChanged(Slider* slider) {
 		ngp->lastTweakedParameterMax = sKnob.getMaximum();
 		ngp->lastTweakedParameterInc = sKnob.getInterval();
 		ngp->lastTweakedParameterValue = sKnob.getValue();
+		sustain = sKnob.getValue();
+
 	}
 	else if (slider == &rKnob) {
 		ngp->lastTweakedModule = this->id;
@@ -108,6 +117,7 @@ void ADSRModule::sliderValueChanged(Slider* slider) {
 		ngp->lastTweakedParameterMax = rKnob.getMaximum();
 		ngp->lastTweakedParameterInc = rKnob.getInterval();
 		ngp->lastTweakedParameterValue = rKnob.getValue();
+		release = rKnob.getValue();
 	}
 }
 
@@ -180,31 +190,30 @@ double ADSRModule::GetResult(int midiNote, float velocity, int outputID, int voi
 		if (inputs[0].connectedModule >= 0) {
 			float gain = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
 			double result = 0.0;
-			double attack = aKnob.getValue();
-			double sustain = sKnob.getValue();
+			ADSRVoice& currentVoice = voices[voiceID];
 			if (gain > 0.0) {
-				if (voices[voiceID].reset == true) {
-					voices[voiceID].time = 0.0;
-					voices[voiceID].lastGain = 0.0;
-					voices[voiceID].lastTime = 0.0;
-					voices[voiceID].reset = false;
+				if (currentVoice.reset == true) {
+					currentVoice.time = 0.0;
+					currentVoice.lastGain = 0.0;
+					currentVoice.lastTime = 0.0;
+					currentVoice.reset = false;
 				}
-				if (voices[voiceID].time < attack) {
-					result = 1.0 * voices[voiceID].time / attack;
-					voices[voiceID].lastGain = result;
-					voices[voiceID].lastTime = voices[voiceID].time;
+				if (currentVoice.time < attack) {
+					result = 1.0 * currentVoice.time / attack;
+					currentVoice.lastGain = result;
+					currentVoice.lastTime = currentVoice.time;
 				}
-				else if (voices[voiceID].time >= attack) {
-					result = jmax(1.0 - (1.0 - sustain) * ((voices[voiceID].time - attack) / dKnob.getValue()), sustain);
-					voices[voiceID].lastGain = result;
-					voices[voiceID].lastTime = voices[voiceID].time;
+				else if (currentVoice.time >= attack) {
+					result = jmax(1.0 - (1.0 - sustain) * ((currentVoice.time - attack) / decay), sustain);
+					currentVoice.lastGain = result;
+					currentVoice.lastTime = currentVoice.time;
 				}
-				voices[voiceID].time += 1.0 / ngp->sampleRate;
+				currentVoice.time += 1.0 / ngp->sampleRate;
 			}
 			else {
-				result = jmax(voices[voiceID].lastGain - voices[voiceID].lastGain * ((voices[voiceID].time - voices[voiceID].lastTime) / rKnob.getValue()), 0.0);
-				voices[voiceID].time += 1.0 / ngp->sampleRate;
-				voices[voiceID].reset = true;
+				result = jmax(currentVoice.lastGain - currentVoice.lastGain * ((currentVoice.time - currentVoice.lastTime) / release), 0.0);
+				currentVoice.time += 1.0 / ngp->sampleRate;
+				currentVoice.reset = true;
 			}
 			outputs[0] = result;
 		}
@@ -217,10 +226,10 @@ double ADSRModule::GetResult(int midiNote, float velocity, int outputID, int voi
 
 void ADSRModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
 		if (inputs[0].connectedModule >= 0) {
-			float gain = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
+			READ_INPUT(gain, 0)
 			double result = 0.0;
-			double attack = aKnob.getValue();
-			double sustain = sKnob.getValue();
+			READ_KNOB(attack, aKnob)
+			READ_KNOB(sustain, sKnob)
 			if (gain > 0.0) {
 				if (voices[voiceID].reset == true) {
 					voices[voiceID].time = 0.0;

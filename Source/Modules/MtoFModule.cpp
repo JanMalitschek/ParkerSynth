@@ -4,6 +4,7 @@
 #include "..\NodeGraphProcessor.h"
 
 MtoFModule::MtoFModule() : Module(ModuleColorScheme::Grey, "MtoF", 1, 1, 0, Point<int>(4, 3), 0) {
+
 	inputSocketButtons[0]->button.setTooltip("MIDI Note Number");
 	inputSocketButtons[0]->SetValueType(ValueType::MIDINoteNumber);
 	outputSocketButtons[0]->button.setTooltip("Frequency");
@@ -58,8 +59,8 @@ double MtoFModule::GetResult(int midiNote, float velocity, int outputID, int voi
 }
 
 void MtoFModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
-		if (inputs[0].connectedModule >= 0) {
-			outputs[0] = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput];
+		if (IS_INPUT_CONNECTED(0)) {
+			outputs[0] = GET_INPUT(0);
 			outputs[0] = 440.0 * pow(2.0, ((float)outputs[0] - 69) / 12);
 		}
 		else

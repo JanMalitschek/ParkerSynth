@@ -22,5 +22,7 @@ public:
 	inline void GetResultIteratively(int midiNote, float velocity, int voiceID) override;
 private:
 	Slider fmKnob;
+	double fm;
+
 	LaF_RotarySlider laF_Knob;
 };

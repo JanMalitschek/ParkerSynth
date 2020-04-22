@@ -35,6 +35,7 @@ RangeModule::RangeModule() : Module(ModuleColorScheme::Grey, "Range", 0, 1, 1, P
 	lerpAmountKnob.setRotaryParameters(0.0f, 3.1415f, true);
 	lerpAmountKnob.setRange(0.0f, 1.0f, 0.0f);
 	lerpAmountKnob.setValue(0.0f);
+	lerp = 0.0f;
 	lerpAmountKnob.setLookAndFeel(&laF_RotarySlider);
 	lerpAmountKnob.setTooltip("Mix\nValue A - Value B");
 	addAndMakeVisible(lerpAmountKnob);
@@ -60,9 +61,9 @@ void RangeModule::PaintGUI(Graphics &g) {
 }
 
 void RangeModule::ResizeGUI() {
-	inputFieldA.setBounds(25, 25, 50, 25);
-	lerpAmountKnob.setBounds(25, 50, 50, 50);
-	inputFieldB.setBounds(25, 100, 50, 25);
+	inputFieldA.setBounds(UtPX(1), UtPY(1), UtPX(2), UtPY(1));
+	lerpAmountKnob.setBounds(UtPX(1), UtPY(2), UtPX(2), UtPY(2));
+	inputFieldB.setBounds(UtPX(1), UtPY(4), UtPX(2), UtPY(1));
 }
 
 void RangeModule::sliderValueChanged(Slider* slider) {
@@ -74,6 +75,7 @@ void RangeModule::sliderValueChanged(Slider* slider) {
 		ngp->lastTweakedParameterMax = lerpAmountKnob.getMaximum();
 		ngp->lastTweakedParameterInc = lerpAmountKnob.getInterval();
 		ngp->lastTweakedParameterValue = lerpAmountKnob.getValue();
+		lerp = lerpAmountKnob.getValue();
 	}
 }
 
@@ -141,9 +143,7 @@ void RangeModule::textEditorReturnKeyPressed(TextEditor &t) {
 double RangeModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
 	if (canBeEvaluated) {
 		double lerpAmount = 0.0f;
-		if (controls[0].connectedModule == -1)
-			lerpAmount = lerpAmountKnob.getValue();
-		else
+		if(controls[0].connectedModule >= 0)
 			lerpAmount = ngp->modules[controls[0].connectedModule]->GetResult(midiNote, velocity, controls[0].connectedOutput, voiceID);
 
 		outputs[0] = valueA + (valueB - valueA) * lerpAmount;
@@ -153,11 +153,6 @@ double RangeModule::GetResult(int midiNote, float velocity, int outputID, int vo
 }
 
 void RangeModule::GetResultIteratively(int midiNote, float velocity, int voiveID) {
-	double lerpAmount = 0.0f;
-	if (controls[0].connectedModule == -1)
-		lerpAmount = lerpAmountKnob.getValue();
-	else
-		lerpAmount = ngp->modules[controls[0].connectedModule]->outputs[controls[0].connectedOutput];
-
+	READ_CTRL(lerpAmount, 0, lerpAmountKnob.getValue())
 	outputs[0] = valueA + (valueB - valueA) * lerpAmount;
 }

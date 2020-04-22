@@ -10,6 +10,7 @@ GainModule::GainModule() : Module(ModuleColorScheme::Grey, "Gain", 1, 1, 0, Poin
 	gainKnob.setRotaryParameters(-2.35619f, 2.35619f, true);
 	gainKnob.setRange(0.0f, 2.0f, 0.01f);
 	gainKnob.setValue(1.0f);
+	gain = 1.0f;
 	gainKnob.setLookAndFeel(&laF_Knob);
 	gainKnob.setTooltip("Gain\n0.0 - 2.0");
 	addAndMakeVisible(gainKnob);
@@ -26,7 +27,7 @@ void GainModule::PaintGUI(Graphics &g) {
 }
 
 void GainModule::ResizeGUI() {
-	gainKnob.setBounds(25, 25, 50, 50);
+	gainKnob.setBounds(UtPX(1), UtPY(1), UtPX(2), UtPY(2));
 }
 
 void GainModule::sliderValueChanged(Slider* slider) {
@@ -38,6 +39,7 @@ void GainModule::sliderValueChanged(Slider* slider) {
 		ngp->lastTweakedParameterMax = gainKnob.getMaximum();
 		ngp->lastTweakedParameterInc = gainKnob.getInterval();
 		ngp->lastTweakedParameterValue = gainKnob.getValue();
+		gain = gainKnob.getValue();
 	}
 }
 
@@ -75,7 +77,7 @@ void GainModule::SetParameter(int id, float value) {
 double GainModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
 	if (canBeEvaluated) {
 		if (inputs[0].connectedModule >= 0)
-			outputs[0] = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID) * gainKnob.getValue();
+			outputs[0] = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID) * gain;
 		else
 			outputs[0] = 0.0;
 		canBeEvaluated = false;
@@ -84,8 +86,8 @@ double GainModule::GetResult(int midiNote, float velocity, int outputID, int voi
 }
 
 void GainModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
-	if (inputs[0].connectedModule >= 0)
-		outputs[0] = ngp->modules[inputs[0].connectedModule]->outputs[inputs[0].connectedOutput] * gainKnob.getValue();
+	if (IS_INPUT_CONNECTED(0))
+		outputs[0] = GET_INPUT(0) * gainKnob.getValue();
 	else
 		outputs[0] = 0.0;
 }

@@ -22,5 +22,6 @@ public:
 	inline void GetResultIteratively(int midiNote, float velocity, int voiceID) override;
 private:
 	Slider transKnob;
+	double trans;
 	LaF_RotarySlider laF_Knob;
 };

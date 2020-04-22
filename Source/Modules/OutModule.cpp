@@ -42,12 +42,12 @@ void OutModule::SetParameter(int id, float value) {
 }
 
 double OutModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	if (inputs[0].connectedModule >= 0)
+	if (IS_INPUT_CONNECTED(0))
 		return ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
 	else
 		return 0.0f;
 }
 
 void OutModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
-
+	
 }

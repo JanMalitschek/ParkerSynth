@@ -48,6 +48,7 @@ public:
 	void mouseUp(const MouseEvent &event);
 	void mouseDown(const MouseEvent &event);
 	void mouseDrag(const MouseEvent &event);
+	void mouseWheelMove(const MouseEvent &event, const MouseWheelDetails &wheel);
 
 	Mode mode;
 	void BeginConnectModule(unsigned int sourceModuleID, unsigned int sourceOutputID);
@@ -85,15 +86,18 @@ public:
 
 	void SwitchConnections();
 
+	float scale;
+
+	void CalculatePatchBounds();
+
 private:
 	Point<int> mousePos;
 	Point<int> rawMousePos;
 	Point<int> lastMousePos;
 	Point<int> mouseOffset;
 	Point<int> currentModuleSize;
+	Rectangle<int> patchBounds;
 	ModuleType currentModuleType;
-	Point<int> moduleOffset;
-	Point<int> oldModuleOffset;
 
 	unsigned int currentSourceModuleID;
 	unsigned int currentSourceOutputID;

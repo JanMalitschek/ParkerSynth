@@ -29,9 +29,13 @@ public:
 	inline void GetResultIteratively(int midiNote, float velocity, int voiceID) override;
 private:
 	Slider aKnob;
+	double attack;
 	Slider dKnob;
+	double decay;
 	Slider sKnob;
+	double sustain;
 	Slider rKnob;
+	double release;
 	LaF_RotarySlider laF_Knob;
 
 	ADSRVoice voices[9];

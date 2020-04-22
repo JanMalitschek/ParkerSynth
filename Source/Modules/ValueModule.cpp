@@ -32,7 +32,7 @@ void ValueModule::PaintGUI(Graphics &g) {
 }
 
 void ValueModule::ResizeGUI() {
-	inputField.setBounds(25, 25, 50, 25);
+	inputField.setBounds(UtPX(1), UtPY(1), UtPX(2), UtPY(1));
 }
 
 float ValueModule::GetParameter(int id) {
