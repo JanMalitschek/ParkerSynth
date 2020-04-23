@@ -121,6 +121,8 @@ public:
 	int UtPX(int unit);
 	int UtPY(int unit);
 
+	std::vector<Module*> FindNodesConnectedToOutputs();
+
 private:
 	void DrawBackgroundHighlight(Graphics &g, Rectangle<int> bounds);
 

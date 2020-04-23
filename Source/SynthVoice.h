@@ -46,7 +46,7 @@ public:
 		for (int sample = 0; sample < numSamples; ++sample) {
 			double result = 0.0;
 			if (currentVelocity > 0.0 || volume > 0.0) {
-				result = ngp->GetResult(currentMidiNote, currentVelocity, this->id);
+				result = ngp->GetResultIteratively(currentMidiNote, currentVelocity, this->id);
 				if (abs(result) > volume) {
 					volume = abs(result);
 				}

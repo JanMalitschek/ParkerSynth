@@ -162,22 +162,21 @@ void NodeGraphEditor::mouseDrag(const MouseEvent &event) {
 		mousePos.y = (int)(floor(rawMousePos.y * 0.04f) / 0.04f);
 
 		mouseOffset = mousePos - lastMousePos;
-		if (mouseOffset.x < 0 && patchBounds.getBottomRight().x < 200)
+		/*if (mouseOffset.x < 0 && patchBounds.getBottomRight().x < 200)
 			mouseOffset.x = 0;  
 		else if (mouseOffset.x > 0 && patchBounds.getTopLeft().x > getWidth() - 200)
 			mouseOffset.x = 0;
 		if (mouseOffset.y < 0 && patchBounds.getBottomRight().y < 200)
 			mouseOffset.y = 0;
 		else if (mouseOffset.y > 0 && patchBounds.getTopLeft().y > getHeight() - 200)
-			mouseOffset.y = 0;
+			mouseOffset.y = 0;*/
 		lastMousePos = mousePos;
 		/*moduleOffset.setX(jmax(jmin(moduleOffset.getX(), 400), 0));
 		moduleOffset.setY(jmax(jmin(moduleOffset.getY(), 400), 0));*/
 		setMouseCursor(MouseCursor::DraggingHandCursor);
-		this->patchBounds.setPosition(this->patchBounds.getTopLeft() + mouseOffset);
-		for (int i = 0; i < ngp->modules.size(); i++) {
+		//this->patchBounds.setPosition(this->patchBounds.getTopLeft() + mouseOffset);
+		for (int i = 0; i < ngp->modules.size(); i++)
 			ngp->modules[i]->setTopLeftPosition(ngp->modules[i]->getBounds().getTopLeft() + mouseOffset);
-		}
 		repaint(0, 0, 800, 575);
 	}
 }

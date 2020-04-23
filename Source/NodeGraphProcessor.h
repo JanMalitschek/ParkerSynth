@@ -54,7 +54,7 @@ public:
 	int saveDataSize;
 
 private:
-	std::vector<int> evaluationList;
+	std::vector<Module*> evaluationList;
 };
 
 #endif

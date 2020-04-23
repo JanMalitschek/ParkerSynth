@@ -162,3 +162,15 @@ int Module::UtPX(int unit) {
 int Module::UtPY(int unit) {
 	return (getHeight() / this->moduleSize.y) * unit;
 }
+
+std::vector<Module*> Module::FindNodesConnectedToOutputs() {
+	std::vector<Module*> connectedModules = std::vector<Module*>();
+	for (auto m : ngp->modules) {
+		if (!m->canBeEvaluated)
+			continue;
+		for (auto i : m->inputs)
+			if (i.connectedModule == id)
+				connectedModules.push_back(m);
+	}
+	return connectedModules;
+}
