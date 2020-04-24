@@ -34,7 +34,6 @@ ParkerSynthAudioProcessorEditor::~ParkerSynthAudioProcessorEditor()
 //==============================================================================
 void ParkerSynthAudioProcessorEditor::paint (Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (Colour(50, 50, 50));
 
 	g.setColour(Colour(40, 40, 40));

@@ -4,10 +4,9 @@
 #include "..\LookAndFeel\LaF_New.hpp"
 
 struct ADSRVoice {
-	double time;
-	double lastGain;
-	double lastTime;
 	bool reset;
+	double time;
+	double vel;
 };
 
 class ADSRModule : public Module, public Slider::Listener {
@@ -41,5 +40,7 @@ private:
 	ADSRVoice voices[9];
 
 	float lastGain;
+
+	inline double moveTowards(double& value, double target, double maxDelta);
 
 };

@@ -507,6 +507,7 @@ void NodeGraphEditor::MoveModule(int moveModuleID, Point<int> size) {
 }
 
 void NodeGraphEditor::DeleteModule(int moduleID) {
+	ngp->canProcess = false;
 	if (mode == Mode::Idle && moduleID != ngp->outputModuleID) {
 		//Remove connections first so nothing will access a potentially deleted module
 		for (int i = 0; i < ngp->modules[moduleID]->inputs.size(); i++) {
@@ -530,9 +531,10 @@ void NodeGraphEditor::DeleteModule(int moduleID) {
 			}
 		}
 		//Delete Module
-		delete ngp->modules[moduleID];
+		free(ngp->modules[moduleID]);
 		ngp->modules[moduleID] = nullptr;
 		ngp->modules.erase(ngp->modules.begin() + moduleID);
+		ngp->evaluationList.clear();
 		//Shift IDs
 		for (int i = moduleID; i < ngp->modules.size(); i++) {
 			ngp->modules[i]->id -= 1;
@@ -555,6 +557,7 @@ void NodeGraphEditor::DeleteModule(int moduleID) {
 		repaint(0, 0, 800, 575);
 		this->CalculatePatchBounds();
 	}
+	ngp->canProcess = true;
 }
 
 bool NodeGraphEditor::CheckOverlap() {

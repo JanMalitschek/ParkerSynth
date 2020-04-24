@@ -50,10 +50,8 @@ ADSRModule::ADSRModule() : Module(ModuleColorScheme::Blue, "ADSR", 1, 1, 0, Poin
 	addAndMakeVisible(rKnob);
 
 	for (int i = 0; i < 9; i++) {
-		voices[i].time = 0.0;
-		voices[i].lastTime = 0.0;
-		voices[i].lastGain = 0.0;
 		voices[i].reset = false;
+		voices[i].time = voices[i].vel = 0.0;
 	}
 
 	inputSocketButtons[0]->button.setTooltip("Trigger Velocity");
@@ -186,7 +184,8 @@ void ADSRModule::SetParameter(int id, float value) {
 }
 
 double ADSRModule::GetResult(int midiNote, float velocity, int outputID, int voiceID) {
-	if (canBeEvaluated) {
+	return 0.0;
+	/*if (canBeEvaluated) {
 		if (inputs[0].connectedModule >= 0) {
 			float gain = ngp->modules[inputs[0].connectedModule]->GetResult(midiNote, velocity, inputs[0].connectedOutput, voiceID);
 			double result = 0.0;
@@ -221,41 +220,38 @@ double ADSRModule::GetResult(int midiNote, float velocity, int outputID, int voi
 			outputs[0] = 0.0;
 		canBeEvaluated = false;
 	}
-	return outputs[outputID];
+	return outputs[outputID];*/
+}
+
+inline double ADSRModule::moveTowards(double& value, double target, double maxDelta) {
+	if (target > value)
+		value += maxDelta;
+	else if (target < value)
+		value -= maxDelta;
+	return value;
 }
 
 void ADSRModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
-		if (inputs[0].connectedModule >= 0) {
-			READ_INPUT(gain, 0)
-			double result = 0.0;
-			READ_KNOB(attack, aKnob)
-			READ_KNOB(sustain, sKnob)
-			if (gain > 0.0) {
-				if (voices[voiceID].reset == true) {
-					voices[voiceID].time = 0.0;
-					voices[voiceID].lastGain = 0.0;
-					voices[voiceID].lastTime = 0.0;
-					voices[voiceID].reset = false;
-				}
-				if (voices[voiceID].time < attack) {
-					result = 1.0 * voices[voiceID].time / attack;
-					voices[voiceID].lastGain = result;
-					voices[voiceID].lastTime = voices[voiceID].time;
-				}
-				else if (voices[voiceID].time >= attack) {
-					result = jmax(1.0 - (1.0 - sustain) * ((voices[voiceID].time - attack) / dKnob.getValue()), sustain);
-					voices[voiceID].lastGain = result;
-					voices[voiceID].lastTime = voices[voiceID].time;
-				}
-				voices[voiceID].time += 1.0 / ngp->sampleRate;
+	if (IS_INPUT_CONNECTED(0)) {
+		READ_INPUT(gain, 0)
+		double delta = 1.0 / ngp->sampleRate;
+		if (gain > 0.0) {
+			if (voices[voiceID].reset) {
+				voices[voiceID].time = 0.0;
+				voices[voiceID].reset = false;
 			}
-			else {
-				result = jmax(voices[voiceID].lastGain - voices[voiceID].lastGain * ((voices[voiceID].time - voices[voiceID].lastTime) / rKnob.getValue()), 0.0);
-				voices[voiceID].time += 1.0 / ngp->sampleRate;
-				voices[voiceID].reset = true;
+			if (voices[voiceID].time < attack)
+				outputs[0] = moveTowards(voices[voiceID].vel, gain, delta / attack);
+			else if (voices[voiceID].time >= attack) {
+				outputs[0] = moveTowards(voices[voiceID].vel, sustain * gain, delta / decay);
 			}
-			outputs[0] = result;
+			voices[voiceID].time += delta;
 		}
-		else
-			outputs[0] = 0.0;
+		else {
+			outputs[0] = moveTowards(voices[voiceID].vel, 0.0f, delta / release);
+			voices[voiceID].reset = true;
+		}
+	}
+	else
+		outputs[0] = 0.0;
 }

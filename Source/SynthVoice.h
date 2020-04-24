@@ -24,12 +24,10 @@ public:
 		frequency = 440.0f * pow(2.0, ((float)midiNoteNumber - 69) / 12);
 		currentMidiNote = midiNoteNumber;
 		currentVelocity = velocity;
+		volume = 1.0;
 	}
 
 	void stopNote(float velocity, bool allowTailOff) {
-		allowTailOff = true;
-		if(velocity == 0)
-			clearCurrentNote();
 		currentVelocity = 0.0f;
 	}
 
@@ -43,19 +41,31 @@ public:
 
 	void renderNextBlock(AudioBuffer<float> &outputBuffer, int sampleStart, int numSamples) {
 		/*auto now1 = std::chrono::high_resolution_clock::now();*/
-		for (int sample = 0; sample < numSamples; ++sample) {
-			double result = 0.0;
-			if (currentVelocity > 0.0 || volume > 0.0) {
+		if (currentVelocity > 0.0) {
+			while (--numSamples >= 0) {
+				double result = 0.0;
 				result = ngp->GetResultIteratively(currentMidiNote, currentVelocity, this->id);
-				if (abs(result) > volume) {
-					volume = abs(result);
-				}
+				outputBuffer.addSample(0, sampleStart, result);
+				outputBuffer.addSample(1, sampleStart, result);
+				++sampleStart;
 			}
-			volume -= timeStep;
-			volume = jmax(volume, 0.0);
-			outputBuffer.addSample(0, sample, result);
-			outputBuffer.addSample(1, sample, result);
-			//++sampleStart;
+		}
+		else {
+			while (--numSamples >= 0) {
+				double result = 0.0;
+				if (volume > 0.0) {
+					result = ngp->GetResultIteratively(currentMidiNote, 0.0f, this->id);
+					if (abs(result) > volume)
+						volume = abs(result);
+				}
+				volume -= timeStep;
+				volume = jmax(volume, 0.0);
+				outputBuffer.addSample(0, sampleStart, result);
+				outputBuffer.addSample(1, sampleStart, result);
+				++sampleStart;
+				if (currentVelocity <= 0.0 && volume <= 0.005)
+					clearCurrentNote();
+			}
 		}
 		//auto now2 = std::chrono::high_resolution_clock::now();
 		//auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(now2 - now1);

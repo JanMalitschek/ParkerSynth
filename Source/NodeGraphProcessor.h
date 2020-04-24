@@ -53,7 +53,6 @@ public:
 	StringArray saveData;
 	int saveDataSize;
 
-private:
 	std::vector<Module*> evaluationList;
 };
 

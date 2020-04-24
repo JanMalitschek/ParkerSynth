@@ -322,6 +322,7 @@ void NodeGraphProcessor::InitPreset() {
 	currentID = 0;
 	outputModuleID = -1;
 	hasOutModule = false;
+	evaluationList.clear();
 	for (int i = 0; i < modules.size(); i++) {
 		delete modules[i];
 		modules[i] = nullptr;
@@ -347,10 +348,13 @@ double NodeGraphProcessor::GetResult(int midiNote, float velocity, int voiceID) 
 double NodeGraphProcessor::GetResultIteratively(int midiNote, float velocity, int voiceID) {
 	if (!canProcess || outputModuleID < 0)
 		return 0.0;
-	for (int i = 0; i < evaluationList.size(); i++) {
+	for (int i = 0; i < evaluationList.size() - 1; i++) {
 		evaluationList[i]->GetResultIteratively(midiNote, velocity, voiceID);
 	}
-	return modules[modules[outputModuleID]->inputs[0].connectedModule]->outputs[modules[outputModuleID]->inputs[0].connectedOutput];
+	if (modules[outputModuleID]->inputs[0].connectedModule >= 0)
+		return modules[modules[outputModuleID]->inputs[0].connectedModule]->outputs[modules[outputModuleID]->inputs[0].connectedOutput];
+	else
+		return 0.0;
 }
 
 void NodeGraphProcessor::RecompileNodeTree() {
@@ -368,10 +372,14 @@ void NodeGraphProcessor::RecompileNodeTree() {
 
 	while (numFlattenedModules < modules.size()) {
 		for (int m = 0; m < modules.size(); m++) {
+			if (flattenedLookup[modules[m]->id])
+				continue;
 			if (modules[m]->inputs.size() == 0) {
 				evaluationList.push_back(modules[m]);
 				flattenedLookup[modules[m]->id] = true;
 				numFlattenedModules++;
+				if (numFlattenedModules == modules.size())
+					goto Done;
 			}
 			else {
 				bool isRoot = true;
@@ -386,10 +394,12 @@ void NodeGraphProcessor::RecompileNodeTree() {
 					flattenedLookup[modules[m]->id] = true;
 					numFlattenedModules++;
 				}
+				if (numFlattenedModules == modules.size())
+					goto Done;
 			}
 		}
 	}
-
+	Done:
 	free(flattenedLookup);
 	canProcess = true;
 }
