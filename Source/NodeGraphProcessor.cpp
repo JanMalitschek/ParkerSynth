@@ -13,6 +13,7 @@
 #include "Modules\FMModule.hpp"
 
 #include "NodeGraphEditor.h"
+#include "PluginProcessor.h"
 
 NodeGraphProcessor::NodeGraphProcessor()
 {
@@ -155,6 +156,7 @@ void NodeGraphProcessor::SavePreset(bool toPresetFile) {
 }
 
 void NodeGraphProcessor::LoadPreset(bool fromPresetFile) {
+	processor->suspendProcessing(true);
 	StringArray lines = StringArray();
 	if (fromPresetFile) {
 		FileChooser dlg("Load Preset", File::nonexistent, "*.pspr");
@@ -170,7 +172,6 @@ void NodeGraphProcessor::LoadPreset(bool fromPresetFile) {
 		if (lines.size() <= 0)
 			return;
 	}
-	canProcess = false;
 	currentID = 0;
 	outputModuleID = -1;
 	hasOutModule = false;
@@ -309,7 +310,7 @@ void NodeGraphProcessor::LoadPreset(bool fromPresetFile) {
 		macros[currentMacro]->macroTitle.setText(lines[currentLine + i * 6 + 6]);
 	}
 
-	canProcess = true;
+	processor->suspendProcessing(false);
 	if (this->nge != nullptr) {
 		this->nge->RedrawGUI();
 		this->nge->CalculatePatchBounds();
@@ -318,7 +319,7 @@ void NodeGraphProcessor::LoadPreset(bool fromPresetFile) {
 }
 
 void NodeGraphProcessor::InitPreset() {
-	canProcess = false;
+	processor->suspendProcessing(true);
 	currentID = 0;
 	outputModuleID = -1;
 	hasOutModule = false;
@@ -331,7 +332,7 @@ void NodeGraphProcessor::InitPreset() {
 	for (int i = 0; i < macros.size(); i++) {
 		macros[i]->Reset();
 	}
-	canProcess = true;
+	processor->suspendProcessing(false);
 }
 
 double NodeGraphProcessor::GetResult(int midiNote, float velocity, int voiceID) {
@@ -348,6 +349,7 @@ double NodeGraphProcessor::GetResult(int midiNote, float velocity, int voiceID) 
 double NodeGraphProcessor::GetResultIteratively(int midiNote, float velocity, int voiceID) {
 	if (!canProcess || outputModuleID < 0)
 		return 0.0;
+
 	for (int i = 0; i < evaluationList.size() - 1; i++) {
 		evaluationList[i]->GetResultIteratively(midiNote, velocity, voiceID);
 	}
@@ -358,12 +360,40 @@ double NodeGraphProcessor::GetResultIteratively(int midiNote, float velocity, in
 }
 
 void NodeGraphProcessor::RecompileNodeTree() {
-	canProcess = false;
+	processor->suspendProcessing(true);
 	evaluationList.clear();
 	if (outputModuleID < 0) {
-		canProcess = true;
+		processor->suspendProcessing(false);
 		return;
 	}
+	//Remove Deleted Modules
+	for (auto it = modules.begin(); it != modules.end(); it++) {
+		int id = ((Module*)*it)->id;
+		if (((Module*)*it)->deleted) {
+			modules.erase(it--);
+			//Shift IDs
+			for (int i = id; i < modules.size(); i++) {
+				modules[i]->id -= 1;
+			}
+			for (int i = 0; i < modules.size(); i++) {
+				for (int n = 0; n < modules[i]->inputs.size(); n++) {
+					if (modules[i]->inputs[n].connectedModule >= id) {
+						modules[i]->inputs[n].connectedModule -= 1;
+					}
+				}
+				for (int n = 0; n < modules[i]->controls.size(); n++) {
+					if (modules[i]->controls[n].connectedModule >= id) {
+						modules[i]->controls[n].connectedModule -= 1;
+					}
+				}
+			}
+			if (outputModuleID >= 0 && outputModuleID >= id)
+				outputModuleID -= 1;
+			currentID--;
+		}
+	}
+	DBG(modules.size());
+
 	//Create Lookups
 	bool* flattenedLookup = (bool*)malloc(modules.size() * sizeof(bool));
 	for (int m = 0; m < modules.size(); m++)
@@ -401,7 +431,7 @@ void NodeGraphProcessor::RecompileNodeTree() {
 	}
 	Done:
 	free(flattenedLookup);
-	canProcess = true;
+	processor->suspendProcessing(false);
 }
 
 void NodeGraphProcessor::EnableEvaluation() {

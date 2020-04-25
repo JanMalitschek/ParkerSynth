@@ -42,6 +42,7 @@ Macro::Macro()
 
 Macro::~Macro()
 {
+	delete attachment;
 }
 
 void Macro::paint(Graphics &g) {

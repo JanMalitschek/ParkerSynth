@@ -53,10 +53,8 @@ double WhiteNoiseModule::GetResult(int midiNote, float velocity, int outputID, i
 }
 
 void WhiteNoiseModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
-	float velocityIn = 0.0f;
-	if (IS_INPUT_CONNECTED(0))
-		velocityIn = GET_INPUT(0);
-	if (velocityIn > 0.0f) {
-		outputs[0] = (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * velocityIn;
+	READ_INPUT(velocityIn, 0)
+	if (velocityIn > 0.0) {
+		outputs[0] = (static_cast <double> (rand()) / static_cast <double> (RAND_MAX)) * velocityIn;
 	}
 }

@@ -40,6 +40,7 @@ ParkerSynthAudioProcessor::ParkerSynthAudioProcessor()
 	synth.addSound(new SynthSound());
 	ngp = NodeGraphProcessor();
 	ngp.sampleRate = getSampleRate();
+	ngp.processor = this;
 	
 	for (int i = 0; i < 20; i++) {
 		ngp.macros.push_back(new Macro());
@@ -181,7 +182,6 @@ void ParkerSynthAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
-
 	ngp.SavePreset(false);
 	if (ngp.saveData.size() > 5) {
 		for (int i = 0; i < ngp.saveData.size(); i++) {

@@ -21,6 +21,7 @@ Socket::Socket(bool isControl) : Component()
 
 Socket::~Socket()
 {
+	removeAllChildren();
 }
 
 void Socket::paint(Graphics &g) {

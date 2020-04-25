@@ -8,6 +8,7 @@
 #define NUM_VOICES 9
 
 class NodeGraphEditor;
+class ParkerSynthAudioProcessor;
 class NodeGraphProcessor
 {
 public:
@@ -48,7 +49,9 @@ public:
 
 	void EnableEvaluation();
 
-	bool canProcess;
+	volatile bool canProcess;
+
+	ParkerSynthAudioProcessor* processor;
 
 	StringArray saveData;
 	int saveDataSize;

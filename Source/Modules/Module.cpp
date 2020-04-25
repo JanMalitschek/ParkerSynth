@@ -55,18 +55,26 @@ Module::Module(ModuleColorScheme colorScheme, juce::String title, int numInputs,
 }
 
 Module::~Module() {
-	for (int i = 0; i < inputSocketButtons.size(); i++) {
-		delete inputSocketButtons[i];
-	}
-	inputSocketButtons.clear();
-	for (int i = 0; i < outputSocketButtons.size(); i++) {
-		delete outputSocketButtons[i];
-	}
-	outputSocketButtons.clear();
-	for (int i = 0; i < controlSocketButtons.size(); i++) {
-		delete controlSocketButtons[i];
-	}
-	controlSocketButtons.clear();
+	removeMouseListener(this);
+	deleteAllChildren();
+	//for (int i = 0; i < inputSocketButtons.size(); i++) {
+	//	inputSocketButtons[i]->button.removeListener(this);
+	//	delete inputSocketButtons[i];
+	//	inputSocketButtons[i] = nullptr;
+	//}
+	//inputSocketButtons.clear();
+	//for (int i = 0; i < outputSocketButtons.size(); i++) {
+	//	outputSocketButtons[i]->button.removeListener(this);
+	//	delete outputSocketButtons[i];
+	//	outputSocketButtons[i] = nullptr;
+	//}
+	//outputSocketButtons.clear();
+	//for (int i = 0; i < controlSocketButtons.size(); i++) {
+	//	controlSocketButtons[i]->button.removeListener(this);
+	//	delete controlSocketButtons[i];
+	//	controlSocketButtons[i] = nullptr;
+	//}
+	//controlSocketButtons.clear();
 }
 
 void Module::paint(Graphics &g) {

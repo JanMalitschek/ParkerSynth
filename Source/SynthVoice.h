@@ -40,7 +40,6 @@ public:
 	}
 
 	void renderNextBlock(AudioBuffer<float> &outputBuffer, int sampleStart, int numSamples) {
-		/*auto now1 = std::chrono::high_resolution_clock::now();*/
 		if (currentVelocity > 0.0) {
 			while (--numSamples >= 0) {
 				double result = 0.0;
@@ -67,10 +66,6 @@ public:
 					clearCurrentNote();
 			}
 		}
-		//auto now2 = std::chrono::high_resolution_clock::now();
-		//auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(now2 - now1);
-		//DBG(sampleStart);
-		/*lastTime = now;*/
 	}
 	NodeGraphProcessor* ngp;
 

@@ -118,6 +118,8 @@ public:
 
 	int branchID;
 
+	bool deleted = false;
+
 	int UtPX(int unit);
 	int UtPY(int unit);
 

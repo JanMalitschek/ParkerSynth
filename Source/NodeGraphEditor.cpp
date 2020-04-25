@@ -1,4 +1,5 @@
 #include "NodeGraphEditor.h"
+#include "PluginProcessor.h"
 
 NodeGraphEditor::NodeGraphEditor() : Component()
 {
@@ -70,7 +71,7 @@ void NodeGraphEditor::SwitchConnections() {
 
 void NodeGraphEditor::DrawConnections(Graphics &g) {
 	for (int i = 0; i < ngp->modules.size(); i++) {
-		if (ngp->modules[i] != nullptr) {
+		if (ngp->modules[i] != nullptr && ngp->modules[i]->id >= 0) {
 			for (int n = 0; n < ngp->modules[i]->inputs.size(); n++) {
 				if (ngp->modules[i]->inputs[n].connectedModule >= 0) {
 					Point<int> start = ngp->modules[i]->inputSocketButtons[n]->getPosition() + ngp->modules[i]->getPosition() + Point<int>(12, 12);
@@ -507,7 +508,7 @@ void NodeGraphEditor::MoveModule(int moveModuleID, Point<int> size) {
 }
 
 void NodeGraphEditor::DeleteModule(int moduleID) {
-	ngp->canProcess = false;
+	ngp->processor->suspendProcessing(true);
 	if (mode == Mode::Idle && moduleID != ngp->outputModuleID) {
 		//Remove connections first so nothing will access a potentially deleted module
 		for (int i = 0; i < ngp->modules[moduleID]->inputs.size(); i++) {
@@ -531,33 +532,32 @@ void NodeGraphEditor::DeleteModule(int moduleID) {
 			}
 		}
 		//Delete Module
-		free(ngp->modules[moduleID]);
-		ngp->modules[moduleID] = nullptr;
-		ngp->modules.erase(ngp->modules.begin() + moduleID);
-		ngp->evaluationList.clear();
+		//ngp->evaluationList.clear();
+		removeChildComponent(ngp->modules[moduleID]);
+		ngp->modules[moduleID]->deleted = true;
 		//Shift IDs
-		for (int i = moduleID; i < ngp->modules.size(); i++) {
+		/*for (int i = moduleID + 1; i < ngp->modules.size(); i++) {
 			ngp->modules[i]->id -= 1;
 		}
 		for (int i = 0; i < ngp->modules.size(); i++) {
 			for (int n = 0; n < ngp->modules[i]->inputs.size(); n++) {
-				if (ngp->modules[i]->inputs[n].connectedModule >= moduleID) {
+				if (ngp->modules[i]->inputs[n].connectedModule >= moduleID + 1) {
 					ngp->modules[i]->inputs[n].connectedModule -= 1;
 				}
 			}
 			for (int n = 0; n < ngp->modules[i]->controls.size(); n++) {
-				if (ngp->modules[i]->controls[n].connectedModule >= moduleID) {
+				if (ngp->modules[i]->controls[n].connectedModule >= moduleID + 1) {
 					ngp->modules[i]->controls[n].connectedModule -= 1;
 				}
 			}
 		}
-		if (ngp->outputModuleID >= 0 && ngp->outputModuleID >= moduleID)
+		if (ngp->outputModuleID >= 0 && ngp->outputModuleID >= moduleID + 1)
 			ngp->outputModuleID -= 1;
-		ngp->currentID -= 1;
+		ngp->currentID -= 1;*/
 		repaint(0, 0, 800, 575);
 		this->CalculatePatchBounds();
 	}
-	ngp->canProcess = true;
+	ngp->processor->suspendProcessing(false);
 }
 
 bool NodeGraphEditor::CheckOverlap() {
