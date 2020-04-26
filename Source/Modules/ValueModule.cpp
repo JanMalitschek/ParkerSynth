@@ -24,7 +24,8 @@ ValueModule::ValueModule() : Module(ModuleColorScheme::Grey, "Value", 0, 1, 0, P
 }
 
 ValueModule::~ValueModule(){
-
+	inputField.removeListener(this);
+	removeAllChildren();
 }
 
 void ValueModule::PaintGUI(Graphics &g) {

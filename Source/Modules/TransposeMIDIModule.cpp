@@ -24,7 +24,8 @@ TransposeMIDIModule::TransposeMIDIModule() : Module(ModuleColorScheme::Grey, "Tr
 }
 
 TransposeMIDIModule::~TransposeMIDIModule(){
-
+	transKnob.removeListener(this);
+	removeAllChildren();
 }
 
 void TransposeMIDIModule::PaintGUI(Graphics &g) {

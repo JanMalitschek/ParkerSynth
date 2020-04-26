@@ -9,7 +9,7 @@ OutModule::OutModule() : Module(ModuleColorScheme::Pink, "Out", 1, 0, 0, Point<i
 }
 
 OutModule::~OutModule(){
-
+	removeAllChildren();
 }
 
 void OutModule::PaintGUI(Graphics &g) {

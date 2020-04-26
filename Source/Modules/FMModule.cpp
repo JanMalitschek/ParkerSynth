@@ -28,7 +28,8 @@ FMModule::FMModule() : Module(ModuleColorScheme::Grey, "FM", 3, 1, 1, Point<int>
 }
 
 FMModule::~FMModule(){
-
+	fmKnob.removeListener(this);
+	removeAllChildren();
 }
 
 void FMModule::PaintGUI(Graphics &g) {

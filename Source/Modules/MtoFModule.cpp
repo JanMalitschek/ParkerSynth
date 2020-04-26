@@ -12,7 +12,7 @@ MtoFModule::MtoFModule() : Module(ModuleColorScheme::Grey, "MtoF", 1, 1, 0, Poin
 }
 
 MtoFModule::~MtoFModule(){
-
+	removeAllChildren();
 }
 
 void MtoFModule::PaintGUI(Graphics &g) {

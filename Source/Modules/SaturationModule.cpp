@@ -31,7 +31,9 @@ SaturationModule::SaturationModule() : Module(ModuleColorScheme::Grey, "Saturate
 }
 
 SaturationModule::~SaturationModule(){
-
+	slopeKnob.removeListener(this);
+	kneeKnob.removeListener(this);
+	removeAllChildren();
 }
 
 void SaturationModule::PaintGUI(Graphics &g) {

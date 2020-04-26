@@ -54,6 +54,9 @@ RangeModule::RangeModule() : Module(ModuleColorScheme::Grey, "Range", 0, 1, 1, P
 
 RangeModule::~RangeModule()
 {
+	inputFieldA.removeListener(this);
+	inputFieldB.removeListener(this);
+	removeAllChildren();
 }
 
 void RangeModule::PaintGUI(Graphics &g) {

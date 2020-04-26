@@ -168,7 +168,12 @@ CustomToolbar::CustomToolbar() : Component(){
 }
 
 CustomToolbar::~CustomToolbar(){
-
+	/*for (auto it : group_preset)
+		delete it;*/
+	group_preset.clear();
+	/*for (auto it : group_module)
+		delete it;*/
+	group_module.clear();
 }
 
 void CustomToolbar::paint(Graphics &g) {

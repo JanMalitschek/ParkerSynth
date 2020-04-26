@@ -35,7 +35,9 @@ AMRMModule::AMRMModule() : Module(ModuleColorScheme::Grey, "AM RM", 2, 1, 1, Poi
 }
 
 AMRMModule::~AMRMModule(){
-
+	amountKnob.removeListener(this);
+	modeSlider.removeListener(this);
+	removeAllChildren();
 }
 
 void AMRMModule::PaintGUI(Graphics &g) {

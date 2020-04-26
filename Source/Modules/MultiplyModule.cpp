@@ -13,7 +13,7 @@ MultiplyModule::MultiplyModule() : Module(ModuleColorScheme::Grey, "Mul", 2, 1, 
 }
 
 MultiplyModule::~MultiplyModule(){
-
+	removeAllChildren();
 }
 
 void MultiplyModule::PaintGUI(Graphics &g) {

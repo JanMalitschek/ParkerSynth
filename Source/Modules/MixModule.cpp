@@ -22,7 +22,8 @@ MixModule::MixModule() : Module(ModuleColorScheme::Grey, "Mix", 2, 1, 1, Point<i
 }
 
 MixModule::~MixModule(){
-
+	mixKnob.removeListener(this);
+	removeAllChildren();
 }
 
 void MixModule::PaintGUI(Graphics &g) {

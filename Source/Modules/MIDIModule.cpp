@@ -11,7 +11,7 @@ MIDIModule::MIDIModule() : Module(ModuleColorScheme::Pink, "MIDI", 0, 2, 0, Poin
 }
 
 MIDIModule::~MIDIModule(){
-
+	removeAllChildren();
 }
 
 void MIDIModule::PaintGUI(Graphics &g) {

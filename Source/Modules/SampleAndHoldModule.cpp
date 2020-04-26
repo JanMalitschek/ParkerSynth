@@ -14,7 +14,7 @@ SampleAndHoldModule::SampleAndHoldModule() : Module(ModuleColorScheme::Grey, "Sa
 }
 
 SampleAndHoldModule::~SampleAndHoldModule(){
-
+	removeAllChildren();
 }
 
 void SampleAndHoldModule::PaintGUI(Graphics &g) {

@@ -44,7 +44,9 @@ BitcrushModule::BitcrushModule() : Module(ModuleColorScheme::Grey, "Bitcrush", 1
 }
 
 BitcrushModule::~BitcrushModule(){
-
+	depthKnob.removeListener(this);
+	downsampleKnob.removeListener(this);
+	removeAllChildren();
 }
 
 void BitcrushModule::PaintGUI(Graphics &g) {

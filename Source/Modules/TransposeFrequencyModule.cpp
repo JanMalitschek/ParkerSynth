@@ -23,7 +23,8 @@ TransposeFrequencyModule::TransposeFrequencyModule() : Module(ModuleColorScheme:
 }
 
 TransposeFrequencyModule::~TransposeFrequencyModule(){
-
+	transKnob.removeListener(this);
+	removeAllChildren();
 }
 
 void TransposeFrequencyModule::PaintGUI(Graphics &g) {

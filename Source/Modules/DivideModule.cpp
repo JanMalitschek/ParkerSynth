@@ -14,7 +14,7 @@ DivideModule::DivideModule() : Module(ModuleColorScheme::Grey, "Div", 2, 1, 0, P
 }
 
 DivideModule::~DivideModule(){
-
+	removeAllChildren();
 }
 
 void DivideModule::PaintGUI(Graphics &g) {

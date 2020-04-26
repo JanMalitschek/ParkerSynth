@@ -13,7 +13,7 @@ SubtractModule::SubtractModule() : Module(ModuleColorScheme::Grey, "Sub", 2, 1, 
 }
 
 SubtractModule::~SubtractModule(){
-
+	removeAllChildren();
 }
 
 void SubtractModule::PaintGUI(Graphics &g) {

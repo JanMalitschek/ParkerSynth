@@ -14,7 +14,7 @@ WhiteNoiseModule::WhiteNoiseModule() : Module(ModuleColorScheme::Blue, "Noise", 
 }
 
 WhiteNoiseModule::~WhiteNoiseModule(){
-
+	removeAllChildren();
 }
 
 void WhiteNoiseModule::PaintGUI(Graphics &g) {

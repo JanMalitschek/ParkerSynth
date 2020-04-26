@@ -14,7 +14,7 @@ AddModule::AddModule() : Module(ModuleColorScheme::Grey, "Add", 2, 1, 0, Point<i
 }
 
 AddModule::~AddModule(){
-
+	removeAllChildren();
 }
 
 void AddModule::PaintGUI(Graphics &g) {

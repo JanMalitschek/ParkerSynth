@@ -62,7 +62,11 @@ FilterModule::FilterModule() : Module(ModuleColorScheme::Grey, "Filter", 1, 1, 1
 }
 
 FilterModule::~FilterModule(){
-
+	cutoffKnob.removeListener(this);
+	qKnob.removeListener(this);
+	gainKnob.removeListener(this);
+	filterTypeSlider.removeListener(this);
+	removeAllChildren();
 }
 
 void FilterModule::PaintGUI(Graphics &g) {
@@ -235,12 +239,17 @@ double FilterModule::GetResult(int midiNote, float velocity, int outputID, int v
 
 void FilterModule::GetResultIteratively(int midiNote, float velocity, int voiceID) {
 	//Recalculate Voice
+	double co = cutoff;
+	if (IS_CTRL_CONNECTED(0)) {
+		co = GET_CTRL(0);
+		voices[voiceID].mustBeRecalculated = true;
+	}
 	if (voices[voiceID].mustBeRecalculated) {
-		double newValue = filterTypeSlider.getValue();
+		double newValue = type;
 		double norm;
-		double V = pow(10, fabs(gainKnob.getValue()) / 20.0);
-		double K = tan(M_PI * cutoffKnob.getValue());
-		double Q = qKnob.getValue();
+		double V = pow(10, fabs(gain) / 20.0);
+		double K = tan(M_PI * co);
+		double Q = q;
 		if (newValue <= 1.0) { // LowPass
 			norm = 1 / (1 + K / Q + K * K);
 			voices[voiceID].a0 = K * K * norm;

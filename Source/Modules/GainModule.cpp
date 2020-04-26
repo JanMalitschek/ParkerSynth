@@ -19,7 +19,8 @@ GainModule::GainModule() : Module(ModuleColorScheme::Grey, "Gain", 1, 1, 0, Poin
 }
 
 GainModule::~GainModule(){
-
+	gainKnob.removeListener(this);
+	removeAllChildren();
 }
 
 void GainModule::PaintGUI(Graphics &g) {

@@ -56,7 +56,10 @@ BasicGeneratorModule::BasicGeneratorModule() : Module(ModuleColorScheme::Blue, "
 }
 
 BasicGeneratorModule::~BasicGeneratorModule(){
-
+	shapeKnob.removeListener(this);
+	voicesKnob.removeListener(this);
+	detuneKnob.removeListener(this);
+	removeAllChildren();
 }
 
 void BasicGeneratorModule::PaintGUI(Graphics &g) {

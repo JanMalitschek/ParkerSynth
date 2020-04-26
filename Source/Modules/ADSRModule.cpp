@@ -61,7 +61,11 @@ ADSRModule::ADSRModule() : Module(ModuleColorScheme::Blue, "ADSR", 1, 1, 0, Poin
 }
 
 ADSRModule::~ADSRModule(){
-
+	aKnob.removeListener(this);
+	dKnob.removeListener(this);
+	sKnob.removeListener(this);
+	rKnob.removeListener(this);
+	removeAllChildren();
 }
 
 void ADSRModule::PaintGUI(Graphics &g) {
